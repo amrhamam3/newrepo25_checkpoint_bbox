@@ -364,7 +364,7 @@
 
         <ToggleButton
             android:id="@+id/btnWireframe"
-            android:layout_width="0dp" android:layout_height="46dp" android:layout_weight="1"
+            android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:textOn="" android:textOff=""
             android:background="@drawable/bg_toggle_button"
@@ -374,7 +374,7 @@
         <Button
             android:id="@+id/btnMaterial"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp" android:layout_height="46dp" android:layout_weight="1"
+            android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:text="" android:textAllCaps="false"
             android:drawableTop="@drawable/ic_material_palette"
@@ -383,7 +383,7 @@
         <Button
             android:id="@+id/btnUnit"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp" android:layout_height="46dp" android:layout_weight="1"
+            android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:text="@string/unit_mm" android:textAllCaps="false"
             android:textSize="16sp" android:textColor="@color/text_primary" />
@@ -391,7 +391,7 @@
         <Button
             android:id="@+id/btnExport"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp" android:layout_height="46dp" android:layout_weight="1"
+            android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:text="" android:textAllCaps="false"
             android:drawableTop="@drawable/ic_camera_export"
@@ -399,7 +399,7 @@
 
         <ToggleButton
             android:id="@+id/btnLightToggle"
-            android:layout_width="0dp" android:layout_height="46dp" android:layout_weight="1"
+            android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:textOn="" android:textOff=""
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_light_bulb"
@@ -424,7 +424,7 @@
 
         <ToggleButton
             android:id="@+id/btnAutoRotate"
-            android:layout_width="0dp" android:layout_height="46dp" android:layout_weight="1"
+            android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:textOn="" android:textOff=""
             android:background="@drawable/bg_toggle_button"
@@ -433,7 +433,7 @@
 
         <ToggleButton
             android:id="@+id/btnMeasureTool"
-            android:layout_width="0dp" android:layout_height="46dp" android:layout_weight="1"
+            android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:textOn="" android:textOff=""
             android:background="@drawable/bg_toggle_button"
@@ -443,7 +443,7 @@
         <Button
             android:id="@+id/btnInspect"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp" android:layout_height="46dp" android:layout_weight="1"
+            android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:text="" android:textAllCaps="false"
             android:drawableTop="@drawable/ic_inspect"
@@ -452,7 +452,7 @@
         <Button
             android:id="@+id/btnResetView"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp" android:layout_height="46dp" android:layout_weight="1"
+            android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:text="" android:textAllCaps="false"
             android:drawableTop="@drawable/ic_reset_view"
@@ -460,7 +460,7 @@
 
         <ToggleButton
             android:id="@+id/btnBoundingBox"
-            android:layout_width="0dp" android:layout_height="46dp" android:layout_weight="1"
+            android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:textOn="" android:textOff=""
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_bounding_box"
