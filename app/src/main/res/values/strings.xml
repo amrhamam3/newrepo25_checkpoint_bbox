@@ -48,6 +48,10 @@
     <string name="dxf_mode">📐 وضع DXF ثنائي الأبعاد</string>
     <string name="stl_mode">🧊 وضع STL ثلاثي الأبعاد</string>
 
+    <!-- السطرين اللي كانو ناقصين -->
+    <string name="toggle_dxf_view">التبديل لعرض DXF</string>
+    <string name="toggle_stl_view">التبديل لعرض STL</string>
+
     <string name="splash_touch_hint">المس للتفاعل</string>
     <string name="history_clear">🗑️ مسح</string>
     <string name="unit_mm_full">📏  مليمتر (مم)</string>
@@ -108,14 +112,10 @@
 
     <string name="toast_dxf_distance">📏 المسافة: %1$.2f وحدة</string>
 
-    <!-- ══ أضيفت في تدقيق تعدد اللغات (بند 1.2) — كانت نصوص مكتوبة مباشرة بدل ما تتقرا من هنا ══ -->
-
-    <!-- DXFParser -->
     <string name="error_dxf_open_failed">تعذر فتح ملف DXF</string>
     <string name="error_dxf_no_entities">لم يتم العثور على قسم ENTITIES</string>
     <string name="error_dxf_no_displayable">لم يتم العثور على عناصر قابلة للعرض في ملف DXF</string>
 
-    <!-- STLParser -->
     <string name="error_stl_open_failed">تعذر فتح الملف</string>
     <string name="error_stl_empty">الملف فارغ</string>
     <string name="error_stl_too_large">حجم الملف كبير جداً (أكثر من 500 MB). الملف غير مدعوم</string>
@@ -127,28 +127,23 @@
     <string name="error_stl_invalid_value">قيمة غير صالحة في الملف عند: %1$s</string>
     <string name="error_stl_ascii_no_triangles">لم يتم العثور على أي مثلثات صالحة في ملف الـ ASCII STL</string>
 
-    <!-- FileBrowserFragment: permission dialog -->
     <string name="dialog_permission_title">🔐  إذن الوصول للملفات</string>
     <string name="dialog_permission_message">لعرض ملفات STL و DXF من كل مجلدات جهازك، يحتاج التطبيق إذن \"الوصول لكل الملفات\".\n\nسيتم فتح صفحة الإعدادات — فعّل الإذن ثم ارجع للتطبيق.</string>
     <string name="dialog_open_settings">فتح الإعدادات</string>
     <string name="dialog_later">لاحقاً</string>
 
-    <!-- GLViewerView -->
     <string name="toast_waiting_second_point">منتظرين ثاني نقطة قياس</string>
 
-    <!-- History clear dialog (مشترك بين HistoryFragment و SettingsFragment) -->
     <string name="dialog_clear_history_title">🗑️  مسح التاريخ</string>
     <string name="dialog_clear_history_message">هل تريد مسح كل سجل الملفات؟</string>
     <string name="dialog_clear">مسح</string>
     <string name="dialog_cancel">إلغاء</string>
     <string name="history_file_missing">غير موجود</string>
 
-    <!-- MeasurementTools: وحدات القياس -->
     <string name="unit_short_mm">مم</string>
     <string name="unit_short_cm">سم</string>
     <string name="unit_short_inch">بوصة</string>
 
-    <!-- STLRenderer: أسماء الخامات -->
     <string name="material_plastic">بلاستيك</string>
     <string name="material_metal">معدن</string>
     <string name="material_wood">خشب</string>
@@ -158,7 +153,6 @@
     <string name="material_gold">ذهب</string>
     <string name="material_rubber">مطاط</string>
 
-    <!-- SettingsFragment -->
     <string name="dialog_change_name_title">👤  تغيير الاسم</string>
     <string name="hint_new_name">اسمك الجديد</string>
     <string name="default_user_name">صديقي</string>
@@ -169,7 +163,6 @@
     <string name="about_greeting">مرحباً %1$s 👋\n\n</string>
     <string name="about_app_info">%1$s🎮  Amr3D Preview Pro\nالإصدار 7.0\nAmr Hamam 3D © 2026</string>
 
-    <!-- ViewerFragment: أسماء ألوان الخلفية + عنوان اختيار الخامة -->
     <string name="bg_color_dark">داكن</string>
     <string name="bg_color_black">أسود</string>
     <string name="bg_color_gray">رمادي</string>
