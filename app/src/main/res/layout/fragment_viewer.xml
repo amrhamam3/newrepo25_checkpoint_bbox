@@ -391,7 +391,7 @@
             android:gravity="center" android:drawablePadding="0dp"
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_wireframe_glyph"
-            app:drawableTint="@color/accent_orange" />
+            android:drawableTint="@color/accent_orange" />
 
         <Button
             android:id="@+id/btnMaterial"
@@ -403,7 +403,7 @@
             android:gravity="center" android:drawablePadding="0dp"
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_material_palette"
-            app:drawableTint="@color/accent_orange" />
+            android:drawableTint="@color/accent_orange" />
 
         <Button
             android:id="@+id/btnUnit"
@@ -423,7 +423,7 @@
             android:gravity="center" android:drawablePadding="0dp"
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_camera_export"
-            app:drawableTint="@color/accent_orange" />
+            android:drawableTint="@color/accent_orange" />
 
         <ToggleButton
             android:id="@+id/btnLightToggle"
@@ -433,7 +433,7 @@
             android:gravity="center" android:drawablePadding="0dp"
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_light_bulb"
-            app:drawableTint="@color/accent_orange" />
+            android:drawableTint="@color/accent_orange" />
 
     </LinearLayout>
 
@@ -460,7 +460,7 @@
             android:gravity="center" android:drawablePadding="0dp"
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_rotate"
-            app:drawableTint="@color/accent_orange" />
+            android:drawableTint="@color/accent_orange" />
 
         <ToggleButton
             android:id="@+id/btnMeasureTool"
@@ -471,7 +471,7 @@
             android:gravity="center" android:drawablePadding="0dp"
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_measure_ruler"
-            app:drawableTint="@color/accent_orange" />
+            android:drawableTint="@color/accent_orange" />
 
         <Button
             android:id="@+id/btnInspect"
@@ -483,7 +483,7 @@
             android:gravity="center" android:drawablePadding="0dp"
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_inspect"
-            app:drawableTint="@color/accent_orange" />
+            android:drawableTint="@color/accent_orange" />
 
         <Button
             android:id="@+id/btnResetView"
@@ -495,7 +495,7 @@
             android:gravity="center" android:drawablePadding="0dp"
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_reset_view"
-            app:drawableTint="@color/accent_orange" />
+            android:drawableTint="@color/accent_orange" />
 
         <ToggleButton
             android:id="@+id/btnBoundingBox"
@@ -505,7 +505,7 @@
             android:gravity="center" android:drawablePadding="0dp"
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_bounding_box"
-            app:drawableTint="@color/accent_orange" />
+            android:drawableTint="@color/accent_orange" />
 
     </LinearLayout>
 
