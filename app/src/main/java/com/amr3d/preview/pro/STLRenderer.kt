@@ -831,10 +831,12 @@ class STLRenderer : GLSurfaceView.Renderer {
     /** بيرسم صندوق سلكي شفاف حوالين أقصى حدود الموديل الحقيقية (Bounding Box) — مفيد
      * لمعرفة أقصى أبعاد هتحتاجها فعليًا للتصنيع (CNC). بيتفعّل/يتقفل بزرار toggle. */
     private fun drawBoundingBox() {
-        val ref = pivotOverride ?: modelCenter
-        val minX = modelMinBounds[0] - ref[0]; val maxX = modelMaxBounds[0] - ref[0]
-        val minY = modelMinBounds[1] - ref[1]; val maxY = modelMaxBounds[1] - ref[1]
-        val minZ = modelMinBounds[2] - ref[2]; val maxZ = modelMaxBounds[2] - ref[2]
+        // نستخدم إحداثيات الموديل الخام مباشرة زي ما هي — نفس اللي بيتحول بيها الموديل
+        // نفسه في drawMesh عن طريق mvpMatrix. لو نطرح الـ pivot هنا كمان هيتطرح
+        // مرتين (مرة هنا، ومرة جوه modelMatrix) والصندوق هيتزحزح بعيد عن الموديل.
+        val minX = modelMinBounds[0]; val maxX = modelMaxBounds[0]
+        val minY = modelMinBounds[1]; val maxY = modelMaxBounds[1]
+        val minZ = modelMinBounds[2]; val maxZ = modelMaxBounds[2]
 
         // 8 أركان الصندوق
         val c = arrayOf(
@@ -891,13 +893,15 @@ class STLRenderer : GLSurfaceView.Renderer {
         GLES20.glUniformMatrix4fv(mvpHandle, 1, false, mvpMatrix, 0)
         GLES20.glEnableVertexAttribArray(positionHandle)
 
-        // الطول متناسب مع حجم الموديل عشان يبان واضح في أي حجم — النقطة (0,0,0) هنا
-        // هي بالظبط مركز الموديل لأن modelMatrix بيترجم الموديل بحيث مركزه يبقى الأصل
+        // بنرسم العلامة عند إحداثيات الـ pivot الفعلية (مش عند الصفر المحلي) —
+        // عشان بعد ما تتحول بنفس mvpMatrix (اللي بيطرح نفس الـ pivot) تظبط بالظبط
+        // عند نقطة الدوران الحقيقية على سطح الموديل، مش نقطة عشوائية بعيدة عنه.
+        val pivot = pivotOverride ?: modelCenter
         val len = (if (modelRadius > 0f) modelRadius else 1f) * 0.12f
         val lines = floatArrayOf(
-            -len, 0f, 0f,  len, 0f, 0f,
-            0f, -len, 0f,  0f, len, 0f,
-            0f, 0f, -len,  0f, 0f, len
+            pivot[0] - len, pivot[1], pivot[2],  pivot[0] + len, pivot[1], pivot[2],
+            pivot[0], pivot[1] - len, pivot[2],  pivot[0], pivot[1] + len, pivot[2],
+            pivot[0], pivot[1], pivot[2] - len,  pivot[0], pivot[1], pivot[2] + len
         )
         val fb = ByteBuffer.allocateDirect(lines.size * 4).order(ByteOrder.nativeOrder())
             .asFloatBuffer().apply { put(lines); position(0) }
@@ -907,7 +911,7 @@ class STLRenderer : GLSurfaceView.Renderer {
         GLES20.glUniform4f(colorHandle, 1f, 1f, 1f, 0.9f)
         GLES20.glDrawArrays(GLES20.GL_LINES, 0, 6)
 
-        val dot = FloatArray(3) // (0,0,0)
+        val dot = floatArrayOf(pivot[0], pivot[1], pivot[2])
         val dotBuffer = ByteBuffer.allocateDirect(dot.size * 4).order(ByteOrder.nativeOrder())
             .asFloatBuffer().apply { put(dot); position(0) }
         GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 0, dotBuffer)
