@@ -43,6 +43,8 @@ class ViewerFragment : Fragment() {
     private lateinit var btnUnit: Button
     private lateinit var btnExport: Button
     private lateinit var btnLightToggle: ToggleButton
+    private lateinit var btnToggleToolbars: Button
+    private var toolbarsVisible = true
     private lateinit var btnDirections: Button
     private lateinit var directionsPanel: View
     private lateinit var compassRing: android.widget.ImageView
@@ -192,6 +194,14 @@ class ViewerFragment : Fragment() {
         btnUnit             = v.findViewById(R.id.btnUnit)
         btnExport           = v.findViewById(R.id.btnExport)
         btnLightToggle      = v.findViewById(R.id.btnLightToggle)
+        // نتأكد إن كل أزرار التبديل تبدأ مقفولة دايمًا، حتى لو أندرويد حاول
+        // يرجّع حالة قديمة محفوظة من قبل (بيحصل أحيانًا لما الشاشة تتعاد إنشاؤها)
+        btnWireframe.isChecked = false
+        btnLightToggle.isChecked = false
+        btnAutoRotate.isChecked = false
+        btnMeasureTool.isChecked = false
+        btnBoundingBox.isChecked = false
+        btnToggleToolbars   = v.findViewById(R.id.btnToggleToolbars)
         btnDirections       = v.findViewById(R.id.btnDirections)
         directionsPanel     = v.findViewById(R.id.directionsPanel)
         compassRing         = v.findViewById(R.id.compassRing)
@@ -221,6 +231,36 @@ class ViewerFragment : Fragment() {
         loadingContainer    = v.findViewById(R.id.loadingContainer)
         loadingProgress     = v.findViewById(R.id.loadingProgress)
         loadingText         = v.findViewById(R.id.loadingText)
+    }
+
+    /** يطوي شريطي الأدوات (العلوي والسفلي) لتوفير مساحة أكبر للمعاينة */
+    private fun hideToolbars() {
+        listOf(displayToolbar, bottomToolbar).forEach { bar ->
+            bar.animate()
+                .translationY(bar.height.toFloat())
+                .alpha(0f)
+                .setDuration(220)
+                .setInterpolator(AccelerateInterpolator())
+                .withEndAction { bar.visibility = View.GONE }
+                .start()
+        }
+        btnToggleToolbars.animate().rotation(180f).setDuration(220).start()
+    }
+
+    /** يرجّع شريطي الأدوات للظهور تاني */
+    private fun showToolbars() {
+        listOf(displayToolbar, bottomToolbar).forEach { bar ->
+            bar.visibility = View.VISIBLE
+            bar.translationY = bar.height.toFloat()
+            bar.alpha = 0f
+            bar.animate()
+                .translationY(0f)
+                .alpha(1f)
+                .setDuration(220)
+                .setInterpolator(DecelerateInterpolator())
+                .start()
+        }
+        btnToggleToolbars.animate().rotation(0f).setDuration(220).start()
     }
 
     private fun setupWelcome() {
@@ -351,6 +391,13 @@ class ViewerFragment : Fragment() {
         }
         lightWheel.onAngleChanged = { angle ->
             glViewerView.queueEvent { glViewerView.stlRenderer.lightAngle = angle }
+        }
+
+        // زر طي/إظهار شرائط الأدوات — بيدي مساحة أكبر للمعاينة
+        btnToggleToolbars.setOnClickListener {
+            animBtn(it)
+            toolbarsVisible = !toolbarsVisible
+            if (toolbarsVisible) showToolbars() else hideToolbars()
         }
 
         // أزرار الاتجاهات الـ 6
