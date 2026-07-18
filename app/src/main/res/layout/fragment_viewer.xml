@@ -367,16 +367,21 @@
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:textOn="" android:textOff=""
+            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
+            android:gravity="center" android:drawablePadding="0dp"
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_wireframe_glyph"
             app:drawableTint="@color/accent_orange" />
 
         <Button
             android:id="@+id/btnMaterial"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:text="" android:textAllCaps="false"
+            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
+            android:insetTop="0dp" android:insetBottom="0dp"
+            android:gravity="center" android:drawablePadding="0dp"
+            android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_material_palette"
             app:drawableTint="@color/accent_orange" />
 
@@ -390,10 +395,13 @@
 
         <Button
             android:id="@+id/btnExport"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:text="" android:textAllCaps="false"
+            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
+            android:insetTop="0dp" android:insetBottom="0dp"
+            android:gravity="center" android:drawablePadding="0dp"
+            android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_camera_export"
             app:drawableTint="@color/accent_orange" />
 
@@ -401,9 +409,10 @@
             android:id="@+id/btnLightToggle"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:textOn="" android:textOff=""
+            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
+            android:gravity="center" android:drawablePadding="0dp"
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_light_bulb"
-            android:drawablePadding="0dp"
             app:drawableTint="@color/accent_orange" />
 
     </LinearLayout>
@@ -427,6 +436,8 @@
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:textOn="" android:textOff=""
+            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
+            android:gravity="center" android:drawablePadding="0dp"
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_rotate"
             app:drawableTint="@color/accent_orange" />
@@ -436,25 +447,33 @@
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:textOn="" android:textOff=""
+            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
+            android:gravity="center" android:drawablePadding="0dp"
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_measure_ruler"
             app:drawableTint="@color/accent_orange" />
 
         <Button
             android:id="@+id/btnInspect"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:text="" android:textAllCaps="false"
+            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
+            android:insetTop="0dp" android:insetBottom="0dp"
+            android:gravity="center" android:drawablePadding="0dp"
+            android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_inspect"
             app:drawableTint="@color/accent_orange" />
 
         <Button
             android:id="@+id/btnResetView"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:text="" android:textAllCaps="false"
+            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
+            android:insetTop="0dp" android:insetBottom="0dp"
+            android:gravity="center" android:drawablePadding="0dp"
+            android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_reset_view"
             app:drawableTint="@color/accent_orange" />
 
@@ -462,6 +481,8 @@
             android:id="@+id/btnBoundingBox"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:textOn="" android:textOff=""
+            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
+            android:gravity="center" android:drawablePadding="0dp"
             android:background="@drawable/bg_toggle_button"
             android:drawableTop="@drawable/ic_bounding_box"
             app:drawableTint="@color/accent_orange" />
