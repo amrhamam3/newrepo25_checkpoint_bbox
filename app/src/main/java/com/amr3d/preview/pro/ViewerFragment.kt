@@ -25,6 +25,7 @@ class ViewerFragment : Fragment() {
     // ═══ Views ═══
     private lateinit var glViewerView: GLViewerView
     private lateinit var particleField: ParticleFieldView
+    private lateinit var pivotFeedbackView: PivotFeedbackView
     private lateinit var dxf2DView: DXF2DView
     private lateinit var displayToolbar: View
     private lateinit var bottomToolbar: View
@@ -175,6 +176,7 @@ class ViewerFragment : Fragment() {
     private fun bindViews(v: View) {
         glViewerView        = v.findViewById(R.id.glViewerView)
         particleField       = v.findViewById(R.id.particleField)
+        pivotFeedbackView   = v.findViewById(R.id.pivotFeedbackView)
         startParticleLoop()
         dxf2DView           = v.findViewById(R.id.dxf2DView)
         displayToolbar      = v.findViewById(R.id.displayToolbar)
@@ -354,7 +356,11 @@ class ViewerFragment : Fragment() {
         // لو المستخدم لمس الشاشة عشان يدوّر يدويًا، الدوران التلقائي بيقف من نفسه —
         // هنا بنزامن شكل الزرار عشان يرجع "مطفي" بصريًا برضو
         glViewerView.onAutoRotateStopped = { btnAutoRotate.isChecked = false }
-        glViewerView.onTouchDown = { x, y -> setPivotFromTouch(x, y) }
+        glViewerView.onLongPressPivot = { x, y ->
+            setPivotFromTouch(x, y)
+            pivotFeedbackView.pulseAt(x, y)
+            glViewerView.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+        }
 
         dxf2DView.onDistanceMeasured = { dist ->
             Toast.makeText(context, getString(R.string.toast_dxf_distance, dist), Toast.LENGTH_LONG).show()
