@@ -36,9 +36,25 @@ class GLViewerView(context: Context, attrs: AttributeSet? = null) : GLSurfaceVie
     var onMeasureDrag: ((Float, Float) -> Unit)? = null
     /** بينادى لما اللمس اليدوي يوقف الدوران التلقائي، عشان الـ Fragment يزامن شكل الزرار */
     var onAutoRotateStopped: (() -> Unit)? = null
-    /** بتتنادى عند بداية أي لمسة إصبع واحد (مش وضع قياس) — الـ Fragment بيستخدمها
-     * عشان يحدد مركز الدوران (pivot) من نقطة اللمس الأولى على سطح الموديل */
-    var onTouchDown: ((Float, Float) -> Unit)? = null
+    /** بتتنادى بس لما تأكدنا إن اللمسة "ضغطة مطوّلة" فعلاً (مش تدوير ولا لمسة عادية) —
+     * الـ Fragment بيستخدمها عشان يحدد مركز الدوران (pivot) الجديد من نقطة اللمس على
+     * سطح الموديل، ويظهر دايرة تأكيد بصري في نفس المكان */
+    var onLongPressPivot: ((Float, Float) -> Unit)? = null
+
+    private val longPressRunnable = Runnable {
+        longPressTriggered = true
+        onLongPressPivot?.invoke(pendingPivotX, pendingPivotY)
+    }
+    private var pendingPivotX = 0f
+    private var pendingPivotY = 0f
+    private var longPressTriggered = false
+
+    companion object {
+        /** المدة اللي لازم الإصبع يفضل فيها ثابت عشان تتحسب "ضغطة مطوّلة" */
+        private const val LONG_PRESS_TIMEOUT_MS = 500L
+        /** أقصى مسافة حركة مسموح بيها من غير ما نلغي الضغطة المطوّلة (px) */
+        private const val LONG_PRESS_CANCEL_SLOP = 20f
+    }
 
     init {
         setEGLContextClientVersion(2)
@@ -63,10 +79,17 @@ class GLViewerView(context: Context, attrs: AttributeSet? = null) : GLSurfaceVie
                     stlRenderer.autoRotate = false
                     onAutoRotateStopped?.invoke()
                 }
-                if (!measurementModeActive) onTouchDown?.invoke(event.x, event.y)
+                if (!measurementModeActive) {
+                    pendingPivotX = event.x
+                    pendingPivotY = event.y
+                    longPressTriggered = false
+                    removeCallbacks(longPressRunnable)
+                    postDelayed(longPressRunnable, LONG_PRESS_TIMEOUT_MS)
+                }
             }
 
             MotionEvent.ACTION_POINTER_DOWN -> {
+                removeCallbacks(longPressRunnable)
                 lastTouchCount = event.pointerCount
                 previousX = averageX(event)
                 previousY = averageY(event)
@@ -81,6 +104,11 @@ class GLViewerView(context: Context, attrs: AttributeSet? = null) : GLSurfaceVie
                 val dy = curY - previousY
 
                 if (abs(dx) > 1f || abs(dy) > 1f) moved = true
+
+                if (event.pointerCount == 1) {
+                    val distFromDown = hypot(event.x - pendingPivotX, event.y - pendingPivotY)
+                    if (distFromDown > LONG_PRESS_CANCEL_SLOP) removeCallbacks(longPressRunnable)
+                }
 
                 if (event.pointerCount == 1 && isAwaitingSecondMeasurePoint()) {
                     // في وضع القياس وبعد اختيار أول نقطة: الإصبع بيحرّك نقطة القياس التانية
@@ -142,6 +170,7 @@ class GLViewerView(context: Context, attrs: AttributeSet? = null) : GLSurfaceVie
             }
 
             MotionEvent.ACTION_UP -> {
+                removeCallbacks(longPressRunnable)
                 stlRenderer.showPivotIndicator = false
                 stlRenderer.isUserInteracting = false
                 if (lastTouchCount == 1 && (!moved || isAwaitingSecondMeasurePoint())) {
@@ -152,6 +181,7 @@ class GLViewerView(context: Context, attrs: AttributeSet? = null) : GLSurfaceVie
             }
 
             MotionEvent.ACTION_CANCEL -> {
+                removeCallbacks(longPressRunnable)
                 // لو النظام قاطع اللمسة (زي سحب إشعار) — نتأكد إن حركة "التنفس" مش هتفضل واقفة للأبد
                 stlRenderer.showPivotIndicator = false
                 stlRenderer.isUserInteracting = false
