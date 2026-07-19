@@ -261,7 +261,10 @@ class ViewerFragment : Fragment() {
 
     /** يرجّع شريطي الأدوات للظهور تاني */
     private fun showToolbars() {
-        listOf(displayToolbar, bottomToolbar).forEach { bar ->
+        // في وضع DXF (ثنائي الأبعاد) الشريط العلوي (خامة/شبكي/وحدة/تصدير/إضاءة)
+        // المفروض يفضل مخفي دايمًا لأنه خاص بالـ 3D بس — نتجاهله هنا لو is2DMode
+        val barsToShow = if (is2DMode) listOf(bottomToolbar) else listOf(displayToolbar, bottomToolbar)
+        barsToShow.forEach { bar ->
             bar.visibility = View.VISIBLE
             bar.translationY = bar.height.toFloat()
             bar.alpha = 0f
