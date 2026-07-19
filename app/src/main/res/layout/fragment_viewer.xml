@@ -99,6 +99,14 @@
             android:clickable="false"
             android:focusable="false" />
 
+        <!-- دايرة تأكيد تغيير نقطة الدوران (pivot) بالضغطة المطوّلة -->
+        <com.amr3d.preview.pro.PivotFeedbackView
+            android:id="@+id/pivotFeedbackView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="false"
+            android:focusable="false" />
+
         <!-- شاشة عرض DXF ثنائية الأبعاد — بديل للـ GL لما الملف يكون DXF -->
         <com.amr3d.preview.pro.DXF2DView
             android:id="@+id/dxf2DView"
