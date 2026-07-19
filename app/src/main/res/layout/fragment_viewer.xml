@@ -396,6 +396,7 @@
 
         <Button
             android:id="@+id/btnMaterial"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:text="" android:textAllCaps="false"
@@ -416,6 +417,7 @@
 
         <Button
             android:id="@+id/btnExport"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:text="" android:textAllCaps="false"
@@ -479,6 +481,7 @@
 
         <Button
             android:id="@+id/btnInspect"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:text="" android:textAllCaps="false"
@@ -491,6 +494,7 @@
 
         <Button
             android:id="@+id/btnResetView"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
             android:text="" android:textAllCaps="false"
