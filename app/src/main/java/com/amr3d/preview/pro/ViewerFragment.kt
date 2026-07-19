@@ -20,6 +20,16 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.Locale
 
+/**
+ * توسيع بسيط: خلّى أزرار الأيقونات (ImageButton) تتصرف زي زرار toggle عادي
+ * (isChecked) من غير ما نغيّر كل الأماكن اللي بتستخدم .isChecked في الملف ده.
+ * بيشتغل عن طريق isSelected المدمجة في أي View، اللي بتتماشى مع
+ * android:state_selected في bg_toggle_button.xml.
+ */
+private var ImageButton.isChecked: Boolean
+    get() = isSelected
+    set(value) { isSelected = value }
+
 class ViewerFragment : Fragment() {
 
     // ═══ Views ═══
@@ -34,16 +44,16 @@ class ViewerFragment : Fragment() {
     private lateinit var welcomeOverlay: TextView
     private lateinit var btnToggleDxf: ImageButton
     private lateinit var btnWhatsapp: ImageButton
-    private lateinit var btnMeasureTool: ToggleButton
-    private lateinit var btnAutoRotate: ToggleButton
-    private lateinit var btnInspect: Button
-    private lateinit var btnResetView: Button
-    private lateinit var btnBoundingBox: ToggleButton
-    private lateinit var btnWireframe: ToggleButton
-    private lateinit var btnMaterial: Button
+    private lateinit var btnMeasureTool: ImageButton
+    private lateinit var btnAutoRotate: ImageButton
+    private lateinit var btnInspect: ImageButton
+    private lateinit var btnResetView: ImageButton
+    private lateinit var btnBoundingBox: ImageButton
+    private lateinit var btnWireframe: ImageButton
+    private lateinit var btnMaterial: ImageButton
     private lateinit var btnUnit: Button
-    private lateinit var btnExport: Button
-    private lateinit var btnLightToggle: ToggleButton
+    private lateinit var btnExport: ImageButton
+    private lateinit var btnLightToggle: ImageButton
     private lateinit var btnToggleToolbars: Button
     private var toolbarsVisible = true
     private lateinit var btnDirections: Button
@@ -326,7 +336,9 @@ class ViewerFragment : Fragment() {
             if (is2DMode) switchTo3DMode() else switchTo2DMode()
         }
 
-        btnMeasureTool.setOnCheckedChangeListener { btn, isChecked ->
+        btnMeasureTool.setOnClickListener { btn ->
+            btn.isSelected = !btn.isSelected
+            val isChecked = btn.isSelected
             animBtn(btn)
             if (is2DMode) {
                 dxf2DView.measureModeOn = isChecked
@@ -349,7 +361,9 @@ class ViewerFragment : Fragment() {
 
         glViewerView.onMeasureDrag = { x, y -> if (measureModeOn) handleMeasurementDrag(x, y) }
 
-        btnAutoRotate.setOnCheckedChangeListener { btn, isChecked ->
+        btnAutoRotate.setOnClickListener { btn ->
+            btn.isSelected = !btn.isSelected
+            val isChecked = btn.isSelected
             animBtn(btn)
             glViewerView.stlRenderer.autoRotate = isChecked
         }
@@ -373,13 +387,17 @@ class ViewerFragment : Fragment() {
         }
 
         btnResetView.setOnClickListener  { animBtn(it); if (is2DMode) dxf2DView.resetView() else resetCamera() }
-        btnBoundingBox.setOnCheckedChangeListener { btn, isChecked ->
+        btnBoundingBox.setOnClickListener { btn ->
+            btn.isSelected = !btn.isSelected
+            val isChecked = btn.isSelected
             animBtn(btn)
             glViewerView.stlRenderer.showBoundingBox = isChecked
         }
         btnWhatsapp.setOnClickListener   { animBtn(it); openWhatsapp() }
 
-        btnWireframe.setOnCheckedChangeListener { btn, c ->
+        btnWireframe.setOnClickListener { btn ->
+            btn.isSelected = !btn.isSelected
+            val c = btn.isSelected
             animBtn(btn); glViewerView.stlRenderer.wireframeMode = c
         }
 
@@ -387,7 +405,9 @@ class ViewerFragment : Fragment() {
         btnUnit.setOnClickListener      { animBtn(it); cycleUnit() }
         btnExport.setOnClickListener    { animBtn(it); exportCurrentView() }
 
-        btnLightToggle.setOnCheckedChangeListener { btn, c ->
+        btnLightToggle.setOnClickListener { btn ->
+            btn.isSelected = !btn.isSelected
+            val c = btn.isSelected
             animBtn(btn)
             lightWheelContainer.visibility = if (c) View.VISIBLE else View.GONE
         }
