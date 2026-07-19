@@ -1,270 +1,244 @@
-package com.amr3d.preview.pro
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_dark">
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Bundle
-import android.text.InputType
-import android.view.*
-import android.widget.*
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.Fragment
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-class SettingsFragment : Fragment() {
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="20dp">
+            <TextView
+                android:layout_width="34dp" android:layout_height="34dp"
+                android:text="◈" android:gravity="center"
+                android:textColor="#1a0e02" android:textSize="16sp" android:textStyle="bold"
+                android:background="@color/accent_orange" android:layout_marginEnd="10dp"/>
+            <TextView
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/settings_title"
+                android:textColor="@color/text_primary" android:textSize="17sp" android:textStyle="bold" />
+        </LinearLayout>
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
-        val view  = inflater.inflate(R.layout.fragment_settings, container, false)
-        AppTheme.applyThemeRecursively(view, requireContext())
-        val prefs = requireContext().getSharedPreferences("amr3d_prefs", Context.MODE_PRIVATE)
-        val ctx   = requireContext()
+        <!-- ══ الحساب ══ -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/settings_user" android:textColor="@color/accent_orange"
+            android:textSize="11sp" android:textStyle="bold" android:letterSpacing="0.06"
+            android:layout_marginStart="10dp" android:layout_marginBottom="10dp"/>
 
-        // ══ اللغة ══
-        val languageGroup = view.findViewById<RadioGroup>(R.id.languageGroup)
-        when (LocaleHelper.getSavedLanguage(ctx)) {
-            LocaleHelper.Lang.ARABIC  -> languageGroup.check(R.id.radioLangAr)
-            LocaleHelper.Lang.ENGLISH -> languageGroup.check(R.id.radioLangEn)
-            LocaleHelper.Lang.FRENCH  -> languageGroup.check(R.id.radioLangFr)
-            LocaleHelper.Lang.SPANISH -> languageGroup.check(R.id.radioLangEs)
-        }
-        languageGroup.setOnCheckedChangeListener { _, id ->
-            val newLang = when (id) {
-                R.id.radioLangAr -> LocaleHelper.Lang.ARABIC
-                R.id.radioLangEn -> LocaleHelper.Lang.ENGLISH
-                R.id.radioLangFr -> LocaleHelper.Lang.FRENCH
-                R.id.radioLangEs -> LocaleHelper.Lang.SPANISH
-                else -> LocaleHelper.Lang.ARABIC
-            }
-            if (newLang != LocaleHelper.getSavedLanguage(ctx)) {
-                LocaleHelper.setLanguage(ctx, newLang)
-                // إعادة تشغيل نظيفة بالكامل (مش recreate) — عشان نتجنب تعارض
-                // الفراجمنتس المحفوظة تلقائياً مع اللي بيضيفها MainActivity يدوياً،
-                // اللي كان بيسبب كراش وإحساس إن التطبيق "بيقفل ويفتح لوحده"
-                val restartIntent = Intent(ctx, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                }
-                startActivity(restartIntent)
-                requireActivity().finish()
-            }
-        }
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_settings_card_group"
+            android:padding="6dp"
+            android:layout_marginBottom="20dp">
+            <Button android:id="@+id/btnChangeName"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:minHeight="0dp"
+                android:background="?attr/selectableItemBackground"
+                android:text="@string/settings_change_name" android:textAllCaps="false"
+                android:textColor="@color/text_primary" android:textSize="14sp"
+                android:gravity="start|center_vertical" android:paddingStart="12dp" android:paddingEnd="12dp"
+                android:paddingTop="14dp" android:paddingBottom="14dp"/>
+        </LinearLayout>
 
-        // ══ وحدة القياس ══
-        val unitGroup = view.findViewById<RadioGroup>(R.id.unitGroup)
-        when (prefs.getString("unit", "MM")) {
-            "MM"   -> unitGroup.check(R.id.radioMM)
-            "CM"   -> unitGroup.check(R.id.radioCM)
-            "INCH" -> unitGroup.check(R.id.radioInch)
-        }
-        unitGroup.setOnCheckedChangeListener { _, id ->
-            prefs.edit().putString("unit", when (id) {
-                R.id.radioMM   -> "MM"
-                R.id.radioCM   -> "CM"
-                R.id.radioInch -> "INCH"
-                else -> "MM"
-            }).apply()
-        }
+        <!-- ══ المظهر (ثيم + لغة مع بعض في كارت واحد) ══ -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/settings_appearance" android:textColor="@color/accent_orange"
+            android:textSize="11sp" android:textStyle="bold" android:letterSpacing="0.06"
+            android:layout_marginStart="10dp" android:layout_marginBottom="10dp"/>
 
-        // ══ ألوان التطبيق ══
-        setupThemeRow(view)
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_settings_card_group"
+            android:padding="10dp"
+            android:layout_marginBottom="20dp">
 
-        // ══ تغيير الاسم ══
-        view.findViewById<Button>(R.id.btnChangeName).setOnClickListener {
-            val input = EditText(ctx).apply {
-                hint = "اسمك الجديد"
-                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
-                setTextColor(0xFFF2F3F5.toInt())
-                setHintTextColor(0xFF9CA3AF.toInt())
-                setPadding(40, 24, 40, 24)
-                textSize = 16f
-                val saved = MainActivity.getUserName(ctx)
-                if (saved.isNotEmpty()) setText(saved)
-            }
-            AlertDialog.Builder(ctx)
-                .setTitle("👤  تغيير الاسم")
-                .setView(input)
-                .setPositiveButton("حفظ") { _, _ ->
-                    val name = input.text.toString().trim().ifEmpty { "صديقي" }
-                    MainActivity.saveUserName(ctx, name)
-                    Toast.makeText(ctx, getString(R.string.toast_saved_name, name), Toast.LENGTH_SHORT).show()
-                    refreshVersionText(view)
-                }
-                .setNegativeButton("إلغاء", null).show()
-        }
+            <LinearLayout android:id="@+id/themeColorRow"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="6dp"
+                android:layout_marginBottom="10dp"/>
 
-        // ══ جودة العرض ══
-        val qualityGroup = view.findViewById<RadioGroup>(R.id.qualityGroup)
-        when (prefs.getString("quality", "HIGH")) {
-            "HIGH"   -> qualityGroup.check(R.id.radioHigh)
-            "MEDIUM" -> qualityGroup.check(R.id.radioMedium)
-            "LOW"    -> qualityGroup.check(R.id.radioLow)
-        }
-        qualityGroup.setOnCheckedChangeListener { _, id ->
-            prefs.edit().putString("quality", when (id) {
-                R.id.radioHigh   -> "HIGH"
-                R.id.radioMedium -> "MEDIUM"
-                R.id.radioLow    -> "LOW"
-                else -> "HIGH"
-            }).apply()
-            Toast.makeText(ctx, getString(R.string.toast_applies_next_file), Toast.LENGTH_SHORT).show()
-        }
+            <RadioGroup android:id="@+id/languageGroup"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:padding="6dp">
+                <RadioButton android:id="@+id/radioLangAr" android:text="🇪🇬  العربية"
+                    android:textColor="@color/text_primary" android:buttonTint="@color/accent_orange"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp"/>
+                <RadioButton android:id="@+id/radioLangEn" android:text="🇬🇧  English"
+                    android:textColor="@color/text_primary" android:buttonTint="@color/accent_orange"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp"/>
+                <RadioButton android:id="@+id/radioLangFr" android:text="🇫🇷  Français"
+                    android:textColor="@color/text_primary" android:buttonTint="@color/accent_orange"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp"/>
+                <RadioButton android:id="@+id/radioLangEs" android:text="🇪🇸  Español"
+                    android:textColor="@color/text_primary" android:buttonTint="@color/accent_orange"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp"/>
+            </RadioGroup>
+        </LinearLayout>
 
-        // ══ الصوت ══
-        val soundSwitch = view.findViewById<Switch>(R.id.switchSound)
-        soundSwitch.isChecked = prefs.getBoolean("sound_enabled", true)
-        soundSwitch.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("sound_enabled", checked).apply()
-        }
+        <!-- ══ العارض (جودة + مؤشر Pivot + دوران تلقائي + وحدة قياس مع بعض) ══ -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/settings_viewer_section" android:textColor="@color/accent_orange"
+            android:textSize="11sp" android:textStyle="bold" android:letterSpacing="0.06"
+            android:layout_marginStart="10dp" android:layout_marginBottom="10dp"/>
 
-        // ══ الانيميشن ══
-        val animSwitch = view.findViewById<Switch>(R.id.switchAnim)
-        animSwitch.isChecked = prefs.getBoolean("anim_enabled", true)
-        animSwitch.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("anim_enabled", checked).apply()
-        }
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_settings_card_group"
+            android:padding="6dp"
+            android:layout_marginBottom="20dp">
 
-        // ══ المحور الرأسي Z-up (لملفات 3ds Max/CAD) — الافتراضي: مفعّل ══
-        val zUpSwitch = view.findViewById<Switch>(R.id.switchZUp)
-        zUpSwitch.isChecked = prefs.getBoolean("zup_mode", true)
-        zUpSwitch.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("zup_mode", checked).apply()
-        }
+            <RadioGroup android:id="@+id/qualityGroup"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:padding="8dp">
+                <RadioButton android:id="@+id/radioHigh" android:text="@string/settings_quality_high_full"
+                    android:textColor="@color/text_primary" android:buttonTint="@color/accent_orange"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp"/>
+                <RadioButton android:id="@+id/radioMedium" android:text="@string/settings_quality_medium_full"
+                    android:textColor="@color/text_primary" android:buttonTint="@color/accent_orange"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp"/>
+                <RadioButton android:id="@+id/radioLow" android:text="@string/settings_quality_low_full"
+                    android:textColor="@color/text_primary" android:buttonTint="@color/accent_orange"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp"/>
+            </RadioGroup>
 
-        // ══ إظهار الانعكاس تحت الموديل — الافتراضي: مفعّل ══
-        val reflectionSwitch = view.findViewById<Switch>(R.id.switchReflection)
-        reflectionSwitch.isChecked = prefs.getBoolean("reflection_enabled", true)
-        reflectionSwitch.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("reflection_enabled", checked).apply()
-        }
+            <RadioGroup android:id="@+id/unitGroup"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:padding="8dp">
+                <RadioButton android:id="@+id/radioMM" android:text="@string/unit_mm_full"
+                    android:textColor="@color/text_primary" android:buttonTint="@color/accent_orange"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp"/>
+                <RadioButton android:id="@+id/radioCM" android:text="@string/unit_cm_full"
+                    android:textColor="@color/text_primary" android:buttonTint="@color/accent_orange"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp"/>
+                <RadioButton android:id="@+id/radioInch" android:text="@string/unit_inch_full"
+                    android:textColor="@color/text_primary" android:buttonTint="@color/accent_orange"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp"/>
+            </RadioGroup>
 
-        // ══ تواصل ══
-        view.findViewById<Button>(R.id.btnContactWA).setOnClickListener {
-            val phone = "201009172167"
-            val msg = Uri.encode("مرحبًا، عندي استفسار بخصوص تطبيق Amr3D Preview")
-            try {
-                startActivity(Intent(Intent.ACTION_VIEW,
-                    Uri.parse("whatsapp://send?phone=$phone&text=$msg"))
-                    .apply { setPackage("com.whatsapp") })
-            } catch (_: Exception) {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$phone?text=$msg")))
-            }
-        }
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="10dp" android:paddingEnd="10dp"
+                android:paddingTop="12dp" android:paddingBottom="12dp">
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/settings_zup" android:textColor="@color/text_primary" android:textSize="14sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/settings_zup_sub" android:textColor="@color/text_secondary" android:textSize="11sp"
+                        android:layout_marginTop="2dp"/>
+                </LinearLayout>
+                <Switch android:id="@+id/switchZUp"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:thumbTint="@color/accent_orange" android:trackTint="#3AFF8A1E"/>
+            </LinearLayout>
 
-        // ══ إذن الوصول لكل الملفات ══
-        val btnFileAccess = view.findViewById<Button>(R.id.btnFileAccess)
-        fun refreshFileAccessButton() {
-            val granted = android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R ||
-                android.os.Environment.isExternalStorageManager()
-            btnFileAccess.text = if (granted) "✅  مفعّل — إذن كل الملفات" else "📁  إذن الوصول لكل الملفات"
-        }
-        refreshFileAccessButton()
-        btnFileAccess.setOnClickListener {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                try {
-                    startActivity(Intent(
-                        android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                        Uri.parse("package:${ctx.packageName}")
-                    ))
-                } catch (_: Exception) {
-                    startActivity(Intent(android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
-                }
-            } else {
-                Toast.makeText(ctx, getString(R.string.toast_permission_already_granted), Toast.LENGTH_SHORT).show()
-            }
-        }
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="10dp" android:paddingEnd="10dp"
+                android:paddingTop="12dp" android:paddingBottom="12dp">
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="إظهار الانعكاس تحت الموديل" android:textColor="@color/text_primary" android:textSize="14sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="لو اتقفل، هتظهر شبكة (Grid) بدله" android:textColor="@color/text_secondary" android:textSize="11sp"
+                        android:layout_marginTop="2dp"/>
+                </LinearLayout>
+                <Switch android:id="@+id/switchReflection"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:thumbTint="@color/accent_orange" android:trackTint="#3AFF8A1E"/>
+            </LinearLayout>
+        </LinearLayout>
 
-        // ══ مسح التاريخ ══
-        view.findViewById<Button>(R.id.btnClearHistorySettings).setOnClickListener {
-            AlertDialog.Builder(ctx)
-                .setTitle("🗑️ مسح التاريخ")
-                .setMessage("هل تريد مسح كل سجل الملفات؟")
-                .setPositiveButton("مسح") { _, _ ->
-                    HistoryFragment.clearHistory(ctx)
-                    Toast.makeText(ctx, getString(R.string.toast_cleared), Toast.LENGTH_SHORT).show()
-                }
-                .setNegativeButton("إلغاء", null).show()
-        }
+        <!-- ══ عام (صوت + انيميشن مع بعض) ══ -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/settings_general" android:textColor="@color/accent_orange"
+            android:textSize="11sp" android:textStyle="bold" android:letterSpacing="0.06"
+            android:layout_marginStart="10dp" android:layout_marginBottom="10dp"/>
 
-        refreshVersionText(view)
-        return view
-    }
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_settings_card_group"
+            android:padding="6dp"
+            android:layout_marginBottom="20dp">
 
-    override fun onResume() {
-        super.onResume()
-        view?.findViewById<Button>(R.id.btnFileAccess)?.let { btn ->
-            val granted = android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R ||
-                android.os.Environment.isExternalStorageManager()
-            btn.text = if (granted) "✅  مفعّل — إذن كل الملفات" else "📁  إذن الوصول لكل الملفات"
-        }
-    }
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="10dp" android:paddingEnd="10dp"
+                android:paddingTop="12dp" android:paddingBottom="12dp">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:text="@string/settings_sound"
+                    android:textColor="@color/text_primary" android:textSize="14sp"/>
+                <Switch android:id="@+id/switchSound"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:thumbTint="@color/accent_orange" android:trackTint="#3AFF8A1E"/>
+            </LinearLayout>
 
-    private fun refreshVersionText(view: View) {
-        val name = MainActivity.getUserName(requireContext())
-        val greeting = if (name.isNotEmpty()) "مرحباً $name 👋\n\n" else ""
-        view.findViewById<TextView>(R.id.tvVersion).text =
-            "${greeting}🎮  Amr3D Preview Pro\nالإصدار 7.0\nAmr Hamam 3D © 2026"
-    }
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="10dp" android:paddingEnd="10dp"
+                android:paddingTop="12dp" android:paddingBottom="12dp">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:text="@string/settings_anim"
+                    android:textColor="@color/text_primary" android:textSize="14sp"/>
+                <Switch android:id="@+id/switchAnim"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:thumbTint="@color/accent_orange" android:trackTint="#3AFF8A1E"/>
+            </LinearLayout>
+        </LinearLayout>
 
-    /** يبني صف دوائر ألوان الثيم القابلة للاختيار */
-    private fun setupThemeRow(view: View) {
-        val ctx = requireContext()
-        val row = view.findViewById<LinearLayout>(R.id.themeColorRow)
-        row.removeAllViews()
+        <!-- ══ الأذونات والإجراءات مع بعض ══ -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/settings_permissions" android:textColor="@color/accent_orange"
+            android:textSize="11sp" android:textStyle="bold" android:letterSpacing="0.06"
+            android:layout_marginStart="10dp" android:layout_marginBottom="10dp"/>
 
-        val current = AppTheme.getCurrent(ctx)
-        val density = ctx.resources.displayMetrics.density
-        val circleSize = (44 * density).toInt()
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_settings_card_group"
+            android:padding="6dp"
+            android:layout_marginBottom="20dp">
 
-        AppTheme.ThemeColor.values().forEach { theme ->
-            val cell = LinearLayout(ctx).apply {
-                orientation = LinearLayout.VERTICAL
-                gravity = android.view.Gravity.CENTER
-                layoutParams = LinearLayout.LayoutParams(
-                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
-                ).also { it.setMargins(4, 0, 4, 0) }
-            }
+            <Button android:id="@+id/btnFileAccess"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:minHeight="0dp"
+                android:background="?attr/selectableItemBackground"
+                android:text="@string/settings_file_access" android:textAllCaps="false"
+                android:textColor="@color/text_primary" android:textSize="14sp"
+                android:gravity="start|center_vertical" android:paddingStart="12dp" android:paddingEnd="12dp"
+                android:paddingTop="14dp" android:paddingBottom="14dp"/>
 
-            val circle = object : View(ctx) {
-                override fun onDraw(c: android.graphics.Canvas) {
-                    val p = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
-                    val r = minOf(width, height) / 2f - 3f
-                    val cx = width / 2f; val cy = height / 2f
+            <Button android:id="@+id/btnClearHistorySettings"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:minHeight="0dp"
+                android:background="?attr/selectableItemBackground"
+                android:text="@string/settings_clear_history" android:textAllCaps="false"
+                android:textColor="#FF6B6B" android:textSize="14sp"
+                android:gravity="start|center_vertical" android:paddingStart="12dp" android:paddingEnd="12dp"
+                android:paddingTop="14dp" android:paddingBottom="14dp"/>
+        </LinearLayout>
 
-                    p.shader = android.graphics.RadialGradient(
-                        cx - r * 0.25f, cy - r * 0.25f, r * 1.1f,
-                        intArrayOf(theme.accent, theme.accentDark),
-                        floatArrayOf(0f, 1f),
-                        android.graphics.Shader.TileMode.CLAMP
-                    )
-                    c.drawCircle(cx, cy, r, p)
-                    p.shader = null
+        <Button android:id="@+id/btnContactWA"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/settings_contact_wa" android:textAllCaps="false"
+            android:backgroundTint="#25D366" android:layout_marginBottom="20dp"/>
 
-                    // بريق
-                    p.shader = android.graphics.RadialGradient(
-                        cx - r * 0.2f, cy - r * 0.25f, r * 0.5f,
-                        intArrayOf(0x99FFFFFF.toInt(), 0x00FFFFFF),
-                        floatArrayOf(0f, 1f), android.graphics.Shader.TileMode.CLAMP
-                    )
-                    c.drawCircle(cx - r * 0.1f, cy - r * 0.15f, r * 0.45f, p)
-                    p.shader = null
+        <!-- ══ معلومات ══ -->
+        <TextView android:id="@+id/tvVersion"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary" android:textSize="12sp"
+            android:gravity="center" android:lineSpacingExtra="4dp"/>
 
-                    // حلقة اختيار
-                    if (theme == AppTheme.getCurrent(ctx)) {
-                        p.style = android.graphics.Paint.Style.STROKE
-                        p.strokeWidth = 3f
-                        p.color = 0xFFFFFFFF.toInt()
-                        c.drawCircle(cx, cy, r + 4f, p)
-                    }
-                }
-            }
-            circle.layoutParams = LinearLayout.LayoutParams(circleSize, circleSize)
-            circle.setOnClickListener {
-                AppTheme.setCurrent(ctx, theme)
-                setupThemeRow(view) // إعادة رسم لتحديث الحلقة
-                Toast.makeText(ctx, getString(R.string.toast_theme_applied, theme.nameAr), Toast.LENGTH_LONG).show()
-            }
-            cell.addView(circle)
-            row.addView(cell)
-        }
-    }
-}
+    </LinearLayout>
+</ScrollView>
