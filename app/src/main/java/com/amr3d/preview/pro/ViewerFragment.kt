@@ -132,6 +132,7 @@ class ViewerFragment : Fragment() {
         }
         glViewerView.stlRenderer.qualityLevel = quality
         glViewerView.stlRenderer.zUpMode = prefs.getBoolean("zup_mode", true)
+        glViewerView.stlRenderer.showReflection = prefs.getBoolean("reflection_enabled", true)
     }
 
     override fun onResume() {
@@ -351,6 +352,7 @@ class ViewerFragment : Fragment() {
             } else {
                 measureModeOn = isChecked
                 glViewerView.measurementModeActive = isChecked
+                glViewerView.stlRenderer.suppressIdleFloat = isChecked
                 android.util.Log.d("Amr3D_MeasureDebug", "toggle -> measureModeOn=$measureModeOn measurementModeActive=${glViewerView.measurementModeActive} currentModel=${currentModel != null}")
                 if (!isChecked) {
                     glViewerView.stlRenderer.clearMeasurementPoints()
