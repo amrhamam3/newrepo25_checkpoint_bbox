@@ -281,6 +281,8 @@ class STLRenderer : GLSurfaceView.Renderer {
     /** true أثناء أي تفاعل لمس فعلي (تدوير/تحريك/تكبير) — بيوقف حركة "التنفس" الخفيفة
      * للموديل عشان مايتعارضش مع سحب المستخدم اليدوي */
     @Volatile var isUserInteracting = false
+    /** true وقت ما وضع القياس مفعّل — بيوقف حركة "التنفس" عشان متعارضش مع دقة اختيار نقطتين القياس */
+    @Volatile var suppressIdleFloat = false
     private var floatPhase = 0f
 
     private val mvpMatrix = FloatArray(16)
@@ -356,6 +358,9 @@ class STLRenderer : GLSurfaceView.Renderer {
     private var modelMinBounds = floatArrayOf(0f, 0f, 0f)
     private var modelMaxBounds = floatArrayOf(0f, 0f, 0f)
     @Volatile var showBoundingBox = false
+    /** true = ارسم انعكاس الموديل تحته (زي المرايا)، false = ارسم شبكة (Grid) بدله.
+     * قابل للتحكم من شاشة الإعدادات. */
+    @Volatile var showReflection = true
 
     fun setMaterial(material: Material) {
         currentMaterial = material
@@ -568,7 +573,7 @@ class STLRenderer : GLSurfaceView.Renderer {
 
         // "تنفس" خفيف جدًا للموديل وهو واقف من غير ما حد يلمسه — بيوقف فورًا لو
         // المستخدم بدأ يسحب عشان مايتعارضش مع التحكم اليدوي
-        val floatOffset = if (!isUserInteracting) {
+        val floatOffset = if (!isUserInteracting && !suppressIdleFloat) {
             floatPhase += 0.025f
             kotlin.math.sin(floatPhase) * (if (modelRadius > 0f) modelRadius else 1f) * 0.012f
         } else 0f
@@ -594,7 +599,7 @@ class STLRenderer : GLSurfaceView.Renderer {
         Matrix.transposeM(normalMatrix, 0, normalMatrix, 0)
 
         drawGroundShadow()
-        drawReflection()
+        if (showReflection) drawReflection() else drawFloorGrid()
         drawMesh()
 
         val pts = measurementPoints.toList() // snapshot آمن
@@ -687,6 +692,49 @@ class STLRenderer : GLSurfaceView.Renderer {
         System.arraycopy(savedMvp, 0, mvpMatrix, 0, 16)
         System.arraycopy(savedModel, 0, modelMatrix, 0, 16)
         System.arraycopy(savedNormal, 0, normalMatrix, 0, 16)
+    }
+
+    /** شبكة مربعات على مستوى الأرضية — بتترسم بدل الانعكاس لما يكون مقفول من
+     * الإعدادات. بتدي إحساس بمقياس المساحة اللي الموديل واقف عليها، من غير ما
+     * تشتت الانتباه عن الموديل نفسه (خطوط رفيعة باهتة). */
+    private fun drawFloorGrid() {
+        val r = if (modelRadius > 0f) modelRadius else 1f
+        val refY = (pivotOverride ?: modelCenter)[1]
+        val floorY = modelBottomY - refY
+        val ext = r * 1.7f
+        val divisions = 12
+        val step = (ext * 2f) / divisions
+
+        val lines = ArrayList<Float>((divisions + 1) * 12)
+        for (i in 0..divisions) {
+            val pos = -ext + i * step
+            // خط موازي لمحور X
+            lines.add(-ext); lines.add(floorY); lines.add(pos)
+            lines.add(ext);  lines.add(floorY); lines.add(pos)
+            // خط موازي لمحور Z
+            lines.add(pos); lines.add(floorY); lines.add(-ext)
+            lines.add(pos); lines.add(floorY); lines.add(ext)
+        }
+        val verts = lines.toFloatArray()
+
+        GLES20.glUseProgram(lineProgram)
+        GLES20.glEnable(GLES20.GL_BLEND)
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
+
+        val posHandle = GLES20.glGetAttribLocation(lineProgram, "vPosition")
+        val mvpHandle = GLES20.glGetUniformLocation(lineProgram, "uMVPMatrix")
+        val colorHandle = GLES20.glGetUniformLocation(lineProgram, "uColor")
+        GLES20.glUniformMatrix4fv(mvpHandle, 1, false, mvpMatrix, 0)
+        GLES20.glUniform4f(colorHandle, 0.55f, 0.57f, 0.6f, 0.35f)
+        GLES20.glLineWidth(1f)
+
+        val vb = ByteBuffer.allocateDirect(verts.size * 4).order(ByteOrder.nativeOrder())
+            .asFloatBuffer().apply { put(verts); position(0) }
+
+        GLES20.glEnableVertexAttribArray(posHandle)
+        GLES20.glVertexAttribPointer(posHandle, 3, GLES20.GL_FLOAT, false, 0, vb)
+        GLES20.glDrawArrays(GLES20.GL_LINES, 0, verts.size / 3)
+        GLES20.glDisableVertexAttribArray(posHandle)
     }
 
     private fun drawSolidMesh() {
