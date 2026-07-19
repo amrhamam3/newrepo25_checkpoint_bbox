@@ -141,6 +141,23 @@
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:thumbTint="@color/accent_orange" android:trackTint="#3AFF8A1E"/>
             </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="10dp" android:paddingEnd="10dp"
+                android:paddingTop="12dp" android:paddingBottom="12dp">
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="إظهار الانعكاس تحت الموديل" android:textColor="@color/text_primary" android:textSize="14sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="لو اتقفل، هتظهر شبكة (Grid) بدله" android:textColor="@color/text_secondary" android:textSize="11sp"
+                        android:layout_marginTop="2dp"/>
+                </LinearLayout>
+                <Switch android:id="@+id/switchReflection"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:thumbTint="@color/accent_orange" android:trackTint="#3AFF8A1E"/>
+            </LinearLayout>
         </LinearLayout>
 
         <!-- ══ عام (صوت + انيميشن مع بعض) ══ -->
