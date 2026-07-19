@@ -390,30 +390,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <ToggleButton
+        <ImageButton
             android:id="@+id/btnWireframe"
             android:saveEnabled="false"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
-            android:textOn="" android:textOff=""
-            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
-            android:gravity="center" android:drawablePadding="0dp"
+            android:padding="7dp"
+            android:scaleType="centerInside"
             android:background="@drawable/bg_toggle_button"
-            android:drawableTop="@drawable/ic_wireframe_glyph"
-            android:drawableTint="@color/accent_orange" />
+            android:src="@drawable/ic_wireframe_glyph"
+            android:tint="@color/accent_orange"
+            android:contentDescription="@string/wireframe" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnMaterial"
-            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
-            android:text="" android:textAllCaps="false"
-            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
-            android:insetTop="0dp" android:insetBottom="0dp"
-            android:gravity="center" android:drawablePadding="0dp"
+            android:padding="7dp"
+            android:scaleType="centerInside"
             android:background="@drawable/bg_toggle_button"
-            android:drawableTop="@drawable/ic_material_palette"
-            android:drawableTint="@color/accent_orange" />
+            android:src="@drawable/ic_material_palette"
+            android:tint="@color/accent_orange"
+            android:contentDescription="@string/material" />
 
         <Button
             android:id="@+id/btnUnit"
@@ -423,29 +421,27 @@
             android:text="@string/unit_mm" android:textAllCaps="false"
             android:textSize="16sp" android:textColor="@color/text_primary" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnExport"
-            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
-            android:text="" android:textAllCaps="false"
-            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
-            android:insetTop="0dp" android:insetBottom="0dp"
-            android:gravity="center" android:drawablePadding="0dp"
+            android:padding="7dp"
+            android:scaleType="centerInside"
             android:background="@drawable/bg_toggle_button"
-            android:drawableTop="@drawable/ic_camera_export"
-            android:drawableTint="@color/accent_orange" />
+            android:src="@drawable/ic_camera_export"
+            android:tint="@color/accent_orange"
+            android:contentDescription="@string/export_image" />
 
-        <ToggleButton
+        <ImageButton
             android:id="@+id/btnLightToggle"
             android:saveEnabled="false"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
-            android:textOn="" android:textOff=""
-            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
-            android:gravity="center" android:drawablePadding="0dp"
+            android:padding="7dp"
+            android:scaleType="centerInside"
             android:background="@drawable/bg_toggle_button"
-            android:drawableTop="@drawable/ic_light_bulb"
-            android:drawableTint="@color/accent_orange" />
+            android:src="@drawable/ic_light_bulb"
+            android:tint="@color/accent_orange"
+            android:contentDescription="@string/light" />
 
     </LinearLayout>
 
@@ -463,66 +459,62 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <ToggleButton
+        <ImageButton
             android:id="@+id/btnAutoRotate"
             android:saveEnabled="false"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
-            android:textOn="" android:textOff=""
-            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
-            android:gravity="center" android:drawablePadding="0dp"
+            android:padding="7dp"
+            android:scaleType="centerInside"
             android:background="@drawable/bg_toggle_button"
-            android:drawableTop="@drawable/ic_rotate"
-            android:drawableTint="@color/accent_orange" />
+            android:src="@drawable/ic_rotate"
+            android:tint="@color/accent_orange"
+            android:contentDescription="تدوير تلقائي" />
 
-        <ToggleButton
+        <ImageButton
             android:id="@+id/btnMeasureTool"
             android:saveEnabled="false"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
-            android:textOn="" android:textOff=""
-            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
-            android:gravity="center" android:drawablePadding="0dp"
+            android:padding="7dp"
+            android:scaleType="centerInside"
             android:background="@drawable/bg_toggle_button"
-            android:drawableTop="@drawable/ic_measure_ruler"
-            android:drawableTint="@color/accent_orange" />
+            android:src="@drawable/ic_measure_ruler"
+            android:tint="@color/accent_orange"
+            android:contentDescription="@string/measure_tool" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnInspect"
-            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
-            android:text="" android:textAllCaps="false"
-            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
-            android:insetTop="0dp" android:insetBottom="0dp"
-            android:gravity="center" android:drawablePadding="0dp"
+            android:padding="7dp"
+            android:scaleType="centerInside"
             android:background="@drawable/bg_toggle_button"
-            android:drawableTop="@drawable/ic_inspect"
-            android:drawableTint="@color/accent_orange" />
+            android:src="@drawable/ic_inspect"
+            android:tint="@color/accent_orange"
+            android:contentDescription="@string/inspect_tool" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnResetView"
-            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
             android:layout_marginEnd="3dp"
-            android:text="" android:textAllCaps="false"
-            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
-            android:insetTop="0dp" android:insetBottom="0dp"
-            android:gravity="center" android:drawablePadding="0dp"
+            android:padding="7dp"
+            android:scaleType="centerInside"
             android:background="@drawable/bg_toggle_button"
-            android:drawableTop="@drawable/ic_reset_view"
-            android:drawableTint="@color/accent_orange" />
+            android:src="@drawable/ic_reset_view"
+            android:tint="@color/accent_orange"
+            android:contentDescription="@string/reset_view" />
 
-        <ToggleButton
+        <ImageButton
             android:id="@+id/btnBoundingBox"
             android:saveEnabled="false"
             android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1"
-            android:textOn="" android:textOff=""
-            android:padding="0dp" android:minWidth="0dp" android:minHeight="0dp"
-            android:gravity="center" android:drawablePadding="0dp"
+            android:padding="7dp"
+            android:scaleType="centerInside"
             android:background="@drawable/bg_toggle_button"
-            android:drawableTop="@drawable/ic_bounding_box"
-            android:drawableTint="@color/accent_orange" />
+            android:src="@drawable/ic_bounding_box"
+            android:tint="@color/accent_orange"
+            android:contentDescription="صندوق الأبعاد" />
 
     </LinearLayout>
 
