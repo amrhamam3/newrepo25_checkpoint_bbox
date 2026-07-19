@@ -130,6 +130,13 @@ class SettingsFragment : Fragment() {
             prefs.edit().putBoolean("zup_mode", checked).apply()
         }
 
+        // ══ إظهار الانعكاس تحت الموديل — الافتراضي: مفعّل ══
+        val reflectionSwitch = view.findViewById<Switch>(R.id.switchReflection)
+        reflectionSwitch.isChecked = prefs.getBoolean("reflection_enabled", true)
+        reflectionSwitch.setOnCheckedChangeListener { _, checked ->
+            prefs.edit().putBoolean("reflection_enabled", checked).apply()
+        }
+
         // ══ تواصل ══
         view.findViewById<Button>(R.id.btnContactWA).setOnClickListener {
             val phone = "201009172167"
