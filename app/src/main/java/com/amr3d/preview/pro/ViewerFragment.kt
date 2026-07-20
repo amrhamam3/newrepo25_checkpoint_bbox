@@ -366,11 +366,20 @@ class ViewerFragment : Fragment() {
 
         glViewerView.onMeasureDrag = { x, y -> if (measureModeOn) handleMeasurementDrag(x, y) }
 
+        // نفس الزرار بيتبدّل دوره حسب الوضع: "دوران تلقائي" في عرض STL ثلاثي الأبعاد
+        // (مالوش معنى في DXF)، و"طبقات" في عرض DXF ثنائي الأبعاد (يعرض قائمة الطبقات
+        // مع Checkbox لإخفاء/إظهار كل طبقة). الأيقونة والوصف بيتغيّروا في
+        // switchTo2DMode/switchTo3DMode.
         btnAutoRotate.setOnClickListener { btn ->
-            btn.isSelected = !btn.isSelected
-            val isChecked = btn.isSelected
-            animBtn(btn)
-            glViewerView.stlRenderer.autoRotate = isChecked
+            if (is2DMode) {
+                animBtn(btn)
+                showDxfLayersDialog()
+            } else {
+                btn.isSelected = !btn.isSelected
+                val isChecked = btn.isSelected
+                animBtn(btn)
+                glViewerView.stlRenderer.autoRotate = isChecked
+            }
         }
         // لو المستخدم لمس الشاشة عشان يدوّر يدويًا، الدوران التلقائي بيقف من نفسه —
         // هنا بنزامن شكل الزرار عشان يرجع "مطفي" بصريًا برضو
@@ -590,6 +599,10 @@ class ViewerFragment : Fragment() {
 
                 dxf2DView.setModel(dxfModel)
 
+                // زرار الطبقات بيتفعّل بس لو الملف فيه أكتر من طبقة واحدة — لو طبقة
+                // واحدة بس مفيش داعي نوريه أصلًا (زي ما طلب في البند 1)
+                btnAutoRotate.visibility = if (dxfModel.layers.size > 1) View.VISIBLE else View.GONE
+
                 emptyStateText.visibility  = View.GONE
                 welcomeText.visibility     = View.GONE
 
@@ -629,6 +642,14 @@ class ViewerFragment : Fragment() {
         measurementCard.visibility = View.GONE
         inspectionCard.visibility  = View.GONE
 
+        // "الدوران التلقائي" مالوش معنى في عرض 2D — بيتحول لزرار "طبقات" بدل ما يختفي،
+        // وحالة الظهور النهائية (لو الملف فيه طبقة واحدة بس) بتتحدد بعد ما الملف يتحمّل
+        // في loadDxfFile عن طريق updateLayersButtonVisibility()
+        btnAutoRotate.isChecked = false
+        btnAutoRotate.setImageResource(R.drawable.ic_layers_panel)
+        btnAutoRotate.contentDescription = getString(R.string.layers_tool)
+        btnAutoRotate.visibility = View.GONE
+
         Toast.makeText(context, getString(R.string.dxf_mode), Toast.LENGTH_SHORT).show()
     }
 
@@ -647,6 +668,48 @@ class ViewerFragment : Fragment() {
         btnInspect.visibility     = View.VISIBLE
         btnBoundingBox.visibility = View.VISIBLE
         btnDirections.visibility  = View.VISIBLE
+
+        // إرجاع زرار "الدوران التلقائي" لشكله وسلوكه الأصلي بعد ما نطلع من وضع DXF
+        btnAutoRotate.isChecked = false
+        btnAutoRotate.setImageResource(R.drawable.ic_rotate)
+        btnAutoRotate.contentDescription = getString(R.string.rotate_tool_description)
+        btnAutoRotate.visibility = View.VISIBLE
+    }
+
+    /** بيعرض قائمة (Dialog) بكل طبقات ملف الـ DXF الحالي، وبجنب كل طبقة Checkbox
+     * لإخفاء/إظهار عناصرها في العرض. الزرار اللي بيستدعي الدالة دي مش بيبان أصلًا
+     * لو الملف فيه طبقة واحدة بس (اتحدد في loadDxfFile). */
+    private fun showDxfLayersDialog() {
+        val ctx = requireContext()
+        val layers = dxf2DView.getLayers()
+        if (layers.isEmpty()) return
+
+        val container = LinearLayout(ctx).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(48, 16, 48, 16)
+        }
+
+        for (layerName in layers) {
+            val row = CheckBox(ctx).apply {
+                text = layerName
+                isChecked = dxf2DView.isLayerVisible(layerName)
+                setTextColor(0xFFF2F3F5.toInt())
+                setPadding(8, 20, 8, 20)
+                textSize = 15f
+                setOnCheckedChangeListener { _, checked ->
+                    dxf2DView.setLayerVisible(layerName, checked)
+                }
+            }
+            container.addView(row)
+        }
+
+        val scroll = ScrollView(ctx).apply { addView(container) }
+
+        AlertDialog.Builder(ctx)
+            .setTitle(getString(R.string.dialog_layers_title))
+            .setView(scroll)
+            .setPositiveButton(getString(R.string.dialog_close)) { dialog, _ -> dialog.dismiss() }
+            .show()
     }
 
     private fun saveToHistory(uri: Uri) {
@@ -746,14 +809,14 @@ class ViewerFragment : Fragment() {
         // ألوان الكرات (gradient start, gradient end, glow) — بترتيب مطابق تمامًا
         // لترتيب Material.values() الجديد (كل الخامات Clay دلوقتي، الفرق بينهم اللون بس)
         val ballColors = listOf(
-            Triple("#B8B8BC", "#3A3A3E", "#6E6E74"),  // كلاي رمادي
-            Triple("#FAF8F2", "#B0AC9E", "#D8D4C8"),  // كلاي أبيض
-            Triple("#7FB0E0", "#1A3860", "#3A6CA0"),  // كلاي أزرق
-            Triple("#B8825A", "#3A2414", "#7A5030"),  // كلاي بني
-            Triple("#FFB068", "#7A3808", "#C06818"),  // كلاي برتقالي
-            Triple("#4A4A50", "#0A0A0C", "#242428"),  // كلاي أسود
-            Triple("#FFE888", "#806810", "#D4A828"),  // كلاي أصفر
-            Triple("#E0806E", "#601A16", "#A03A30"),  // كلاي أحمر
+            Triple("#B8B8BC", "#3A3A3E", "#6E6E74"),  //  رمادي
+            Triple("#FAF8F2", "#B0AC9E", "#D8D4C8"),  //  أبيض
+            Triple("#7FB0E0", "#1A3860", "#3A6CA0"),  //  أزرق
+            Triple("#B8825A", "#3A2414", "#7A5030"),  //  بني
+            Triple("#FFB068", "#7A3808", "#C06818"),  //  برتقالي
+            Triple("#4A4A50", "#0A0A0C", "#242428"),  //  أسود
+            Triple("#FFE888", "#806810", "#D4A828"),  //  أصفر
+            Triple("#E0806E", "#601A16", "#A03A30"),  //  أحمر
         )
 
         val bgColors = listOf(
