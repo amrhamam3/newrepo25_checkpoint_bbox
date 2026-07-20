@@ -809,14 +809,14 @@ class ViewerFragment : Fragment() {
         // ألوان الكرات (gradient start, gradient end, glow) — بترتيب مطابق تمامًا
         // لترتيب Material.values() الجديد (كل الخامات Clay دلوقتي، الفرق بينهم اللون بس)
         val ballColors = listOf(
-            Triple("#B8B8BC", "#3A3A3E", "#6E6E74"),  //  رمادي
-            Triple("#FAF8F2", "#B0AC9E", "#D8D4C8"),  //  أبيض
-            Triple("#7FB0E0", "#1A3860", "#3A6CA0"),  //  أزرق
-            Triple("#B8825A", "#3A2414", "#7A5030"),  //  بني
-            Triple("#FFB068", "#7A3808", "#C06818"),  //  برتقالي
-            Triple("#4A4A50", "#0A0A0C", "#242428"),  //  أسود
-            Triple("#FFE888", "#806810", "#D4A828"),  //  أصفر
-            Triple("#E0806E", "#601A16", "#A03A30"),  //  أحمر
+            Triple("#B8B8BC", "#3A3A3E", "#6E6E74"),  // كلاي رمادي
+            Triple("#FAF8F2", "#B0AC9E", "#D8D4C8"),  // كلاي أبيض
+            Triple("#7FB0E0", "#1A3860", "#3A6CA0"),  // كلاي أزرق
+            Triple("#B8825A", "#3A2414", "#7A5030"),  // كلاي بني
+            Triple("#FFB068", "#7A3808", "#C06818"),  // كلاي برتقالي
+            Triple("#4A4A50", "#0A0A0C", "#242428"),  // كلاي أسود
+            Triple("#FFE888", "#806810", "#D4A828"),  // كلاي أصفر
+            Triple("#E0806E", "#601A16", "#A03A30"),  // كلاي أحمر
         )
 
         val bgColors = listOf(
