@@ -7,9 +7,9 @@ package com.amr3d.preview.pro
  *
  * color: قيمة RGB جاهزة (0xAARRGGBB) — مستخرجة من لون الطبقة (Layer) أو لون العنصر نفسه (ACI)
  */
-data class DxfLine(val x1: Float, val y1: Float, val x2: Float, val y2: Float, val color: Int)
-data class DxfArc(val cx: Float, val cy: Float, val r: Float, val startDeg: Float, val endDeg: Float, val color: Int)
-data class DxfCircle(val cx: Float, val cy: Float, val r: Float, val color: Int)
+data class DxfLine(val x1: Float, val y1: Float, val x2: Float, val y2: Float, val color: Int, val layer: String = "0")
+data class DxfArc(val cx: Float, val cy: Float, val r: Float, val startDeg: Float, val endDeg: Float, val color: Int, val layer: String = "0")
+data class DxfCircle(val cx: Float, val cy: Float, val r: Float, val color: Int, val layer: String = "0")
 
 data class DxfModel(
     val lines: List<DxfLine>,
@@ -17,7 +17,9 @@ data class DxfModel(
     val circles: List<DxfCircle>,
     val minX: Float, val minY: Float,
     val maxX: Float, val maxY: Float,
-    val entityCount: Int
+    val entityCount: Int,
+    /** أسماء كل الطبقات (Layers) الموجودة في الملف، بترتيب ظهورها أول مرة */
+    val layers: List<String> = listOf("0")
 )
 
 /** جدول ألوان الأوتوكاد القياسي (AutoCAD Color Index) — أهم الألوان المستخدمة فعلياً */
