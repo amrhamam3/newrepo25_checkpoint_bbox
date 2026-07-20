@@ -743,16 +743,17 @@ class ViewerFragment : Fragment() {
         val materials = STLRenderer.Material.values()
         val ctx = requireContext()
 
-        // ألوان الكرات (gradient start, gradient end, glow)
+        // ألوان الكرات (gradient start, gradient end, glow) — بترتيب مطابق تمامًا
+        // لترتيب Material.values() الجديد (كل الخامات Clay دلوقتي، الفرق بينهم اللون بس)
         val ballColors = listOf(
-            Triple("#7DD4FF", "#0A3A7A", "#1A72CC"),  // بلاستيك
-            Triple("#F0F0FF", "#383850", "#606088"),  // معدن
-            Triple("#E09A5A", "#3A2210", "#8A5E38"),  // خشب
-            Triple("#F8F6F0", "#808078", "#C8C4B8"),  // رخام
-            Triple("#FFB070", "#602808", "#C06828"),  // نحاس
-            Triple("#3A4850", "#060A0C", "#181E24"),  // كربون
-            Triple("#FFE880", "#705000", "#D4A018"),  // ذهب
-            Triple("#484E54", "#080A0C", "#202428"),  // مطاط
+            Triple("#B8B8BC", "#3A3A3E", "#6E6E74"),  // كلاي رمادي
+            Triple("#FAF8F2", "#B0AC9E", "#D8D4C8"),  // كلاي أبيض
+            Triple("#7FB0E0", "#1A3860", "#3A6CA0"),  // كلاي أزرق
+            Triple("#B8825A", "#3A2414", "#7A5030"),  // كلاي بني
+            Triple("#FFB068", "#7A3808", "#C06818"),  // كلاي برتقالي
+            Triple("#4A4A50", "#0A0A0C", "#242428"),  // كلاي أسود
+            Triple("#FFE888", "#806810", "#D4A828"),  // كلاي أصفر
+            Triple("#E0806E", "#601A16", "#A03A30"),  // كلاي أحمر
         )
 
         val bgColors = listOf(
