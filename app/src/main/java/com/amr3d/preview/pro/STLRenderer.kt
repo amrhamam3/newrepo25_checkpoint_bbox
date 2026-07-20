@@ -48,165 +48,49 @@ class STLRenderer : GLSurfaceView.Renderer {
         // لأي موديل مش قريب من الحجم اللي الرقم الثابت كان متظبّط عليه.
         uniform float uPatternScale;
 
-        // ═══ Hash & Noise ═══
+        // ═══ Hash & Noise (لسه محتاجينها لشبكة الأرضية وتأثيرات تانية) ═══
         float hash(highp vec3 p) {
             p = fract(p * vec3(443.897, 397.297, 491.187));
             p += dot(p.zxy, p.yxz + 19.19);
             return fract(p.x * p.y * p.z);
-        }
-        float hash2(vec2 p) {
-            return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.545);
-        }
-        float noise3(highp vec3 p) {
-            vec3 i = floor(p); vec3 f = fract(p);
-            f = f*f*(3.0-2.0*f);
-            return mix(
-                mix(mix(hash(i),           hash(i+vec3(1,0,0)), f.x),
-                    mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x), f.y),
-                mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),
-                    mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x), f.y), f.z);
-        }
-        float fbm3(highp vec3 p) {
-            float v=0.0,a=0.5;
-            for(int i=0;i<5;i++){v+=a*noise3(p);p*=2.1;a*=0.5;}
-            return v;
-        }
-
-        // ═══ Triplanar UV Mapping (Shrink Wrap) ═══
-        vec2 triplanarUV(highp vec3 worldPos, vec3 N, float scale) {
-            vec3 blend = abs(N);
-            blend = max(blend - 0.2, 0.0);
-            blend /= (blend.x + blend.y + blend.z + 0.001);
-            vec2 uvX = worldPos.yz * scale;
-            vec2 uvY = worldPos.xz * scale;
-            vec2 uvZ = worldPos.xy * scale;
-            return uvX*blend.x + uvY*blend.y + uvZ*blend.z;
-        }
-
-        float triNoise(highp vec3 worldPos, vec3 N, float scale) {
-            vec3 blend = abs(N);
-            blend = max(blend - 0.2, 0.0);
-            blend /= (blend.x + blend.y + blend.z + 0.001);
-            float nx = fbm3(vec3(worldPos.yz * scale, 0.0));
-            float ny = fbm3(vec3(worldPos.xz * scale, 0.0));
-            float nz = fbm3(vec3(worldPos.xy * scale, 0.0));
-            return nx*blend.x + ny*blend.y + nz*blend.z;
         }
 
         void main() {
             vec3 N = normalize(fNormal);
             vec3 L = normalize(uLightDir);
             vec3 V = normalize(vec3(0.0, 0.0, 1.0) - fPosition * 0.008);
-            vec3 H = normalize(L + V);
-            highp vec3 pos = fWorldPos * uPatternScale;
 
+            // ═══ Clay Shading (زي 3ds Max/KeyShot) — لون واحد مطفي بالكامل، من غير
+            // أي لمعة (specular) أو نقوش procedural. بدل اللمعة، بنستخدم إضاءة ثلاثية
+            // (رئيسية + تعبئة + حافة) عشان تدي إحساس بالعمق والتفاصيل من غير أي لمعان. ═══
             vec3 col = uColor.rgb;
-            float rough = 0.5;
-            float metal = 0.0;
-            float shine = 32.0;
-            float spec  = 0.5;
-            float amb   = 0.45;
 
-            // ═══ بلاستيك ═══
-            if (uMaterial == 0) {
-                col   = uColor.rgb;
-                rough = 0.35; metal = 0.0; shine = 32.0; spec = 0.35; amb = 0.42;
-            }
-            // ═══ معدن (Triplanar brushed) ═══
-            else if (uMaterial == 1) {
-                vec2 uv = triplanarUV(pos, N, 6.0);
-                float scratch = noise3(vec3(uv * vec2(1.0, 20.0), 0.3)) * 0.07;
-                float aniso   = noise3(vec3(uv.x * 0.5, uv.y * 30.0, 1.0)) * 0.04;
-                col   = uColor.rgb + vec3(scratch + aniso);
-                rough = 0.18; metal = 1.0; shine = 160.0; spec = 1.4; amb = 0.28;
-            }
-            // ═══ خشب (Triplanar grain) ═══
-            else if (uMaterial == 2) {
-                float grain = triNoise(pos, N, 4.0);
-                // كانت rings بتتحسب بس من length(pos.xz) — يعني حلقات دايرية حوالين محور Y
-                // للموديل كله بغض النظر عن اتجاهه الحقيقي، فكانت بتبان صح بالصدفة بس
-                // في موديلات أسطوانية واقفة على Y وغلط في أي حاجة تانية. دلوقتي بتتحسب لكل
-                // مستوى إسقاط (triplanar) زي باقي الخامات، فبتبان صح من أي اتجاه.
-                vec2 uvWood = triplanarUV(pos, N, 3.0);
-                float rings = sin((length(uvWood) * 22.0) + grain * 8.0) * 0.5 + 0.5;
-                rings = pow(rings, 1.4);
-                float fiber = noise3(pos * vec3(1.0, 0.1, 1.0) * 12.0) * 0.12;
-                // درجات لون أدفى وتباين أوضح بين الحبيبات الفاتحة والغامقة عشان
-                // يبان خشب حقيقي مش بقعة لونين مسطحة
-                vec3 wLight = vec3(0.80, 0.58, 0.28);
-                vec3 wMid   = vec3(0.58, 0.36, 0.15);
-                vec3 wDark  = vec3(0.30, 0.16, 0.06);
-                vec3 wBase  = mix(wDark, wMid, smoothstep(0.0, 0.55, rings + fiber));
-                col   = mix(wBase, wLight, smoothstep(0.55, 1.0, rings + fiber));
-                rough = 0.78; metal = 0.0; shine = 14.0; spec = 0.18; amb = 0.5;
-            }
-            // ═══ رخام (Triplanar veins) ═══
-            else if (uMaterial == 3) {
-                float n1  = triNoise(pos, N, 2.0);
-                float n2  = triNoise(pos * 1.7 + vec3(3.1), N, 3.5);
-                // عروق أرفع وأكتر تفرّع (بإضافة طبقة noise تالتة) بدل خط واحد سميك
-                // بيتكرر بانتظام — كان بيبان زي خطوط متوازية مش عروق رخام طبيعية
-                float n3  = triNoise(pos * 3.1 + vec3(7.7), N, 6.0);
-                float vein= sin((n1 + n2 * 0.6 + n3 * 0.25) * 14.0) * 0.5 + 0.5;
-                vein = smoothstep(0.55, 0.82, vein);
-                vec3 mBase = vec3(0.95, 0.93, 0.90);
-                vec3 mVein = vec3(0.35, 0.33, 0.34);
-                col   = mix(mBase, mVein, vein * 0.75);
-                rough = 0.15; metal = 0.02; shine = 120.0; spec = 1.1; amb = 0.5;
-            }
-            // ═══ نحاس (Triplanar patina) ═══
-            else if (uMaterial == 4) {
-                float pat  = triNoise(pos, N, 3.5);
-                float worn = triNoise(pos * 2.0 + vec3(1.7), N, 5.0) * 0.15;
-                vec3 cBase  = vec3(0.82, 0.47, 0.15);
-                vec3 cPatina= vec3(0.28, 0.58, 0.42);
-                col   = mix(cBase, cPatina, pat * 0.35) + vec3(worn, 0.0, 0.0);
-                rough = 0.38; metal = 0.88; shine = 90.0; spec = 1.0; amb = 0.38;
-            }
-            // ═══ كربون (Triplanar weave) ═══
-            else if (uMaterial == 5) {
-                vec2 uv = triplanarUV(pos, N, 10.0);
-                vec2 g  = uv * 8.0;
-                vec2 gi = floor(g); vec2 gf = fract(g);
-                float weave = mod(gi.x + gi.y, 2.0) < 1.0 ? gf.x : gf.y;
-                float shine2= smoothstep(0.3, 0.7, weave);
-                vec3 cDark  = vec3(0.05, 0.05, 0.07);
-                vec3 cLight = vec3(0.20, 0.20, 0.26);
-                col   = mix(cDark, cLight, shine2 * 0.6);
-                rough = 0.25; metal = 0.65; shine = 110.0; spec = 1.1; amb = 0.22;
-            }
-            // ═══ ذهب ═══
-            else if (uMaterial == 6) {
-                float n = triNoise(pos, N, 4.0) * 0.12;
-                col   = vec3(0.95, 0.72, 0.04) + vec3(n*0.3, n*0.2, 0.0);
-                rough = 0.12; metal = 1.0; shine = 200.0; spec = 1.6; amb = 0.32;
-            }
-            // ═══ مطاط ═══
-            else if (uMaterial == 7) {
-                float bump = triNoise(pos, N, 8.0) * 0.04;
-                col   = uColor.rgb * (0.85 + bump);
-                rough = 0.97; metal = 0.0; shine = 4.0; spec = 0.04; amb = 0.52;
-            }
-
-            // ═══ PBR Lighting ═══
             float NdotL  = max(dot(N, L), 0.0);
-            float NdotH  = max(dot(N, H), 0.0);
-            float NdotV  = max(dot(N, V), 0.0);
-            float fresnel= pow(1.0 - NdotV, 4.0);
-            vec3  specCol= mix(vec3(0.04), col, metal);
+            // ضوء تعبئة من الاتجاه المعاكس تقريبًا — بيوضّح التفاصيل في المناطق
+            // البعيدة عن الضوء الرئيسي من غير ما تبقى سودة تمامًا
+            float NdotL2 = max(dot(N, normalize(vec3(-0.35, -0.55, 0.4))), 0.0);
+            // ضوء حافة خفيف من فوق — بيدي تمايز بسيط للحواف العلوية
+            float NdotL3 = max(dot(N, normalize(vec3(0.0, 1.0, 0.15))), 0.0);
 
-            vec3 ambient  = col * amb;
-            vec3 diffuse  = col * NdotL * (1.0 - metal) * 0.78;
-            vec3 specular = specCol * pow(NdotH, shine) * spec;
-            vec3 rim      = col * fresnel * (0.15 + metal * 0.25);
+            // إحساس بسيط بالـ Ambient Occlusion: المناطق اللي مش واخدة ضوء كفاية من
+            // أي مصدر من التلاتة (يعني تجاويف/تفاصيل غايرة) بتتظلل شوية أكتر —
+            // من غير أي حسابات ضوضاء إضافية تقيلة على الأداء
+            float lightSum = NdotL + NdotL2 * 0.5 + NdotL3 * 0.3;
+            float occlusion = clamp(0.55 + lightSum * 0.5, 0.55, 1.0);
 
-            // ضوء ثانوي خفيف
-            float NdotL2  = max(dot(N, normalize(vec3(-0.4,-0.8,0.2))), 0.0);
-            vec3  fill    = col * NdotL2 * 0.10;
+            vec3 ambient  = col * 0.42 * occlusion;
+            vec3 diffuse  = col * NdotL  * 0.62;
+            vec3 fill     = col * NdotL2 * 0.16;
+            vec3 rimLight = col * NdotL3 * 0.10;
 
-            vec3 result = ambient + diffuse + specular + rim + fill;
-            result = result / (result + vec3(0.6));  // tone mapping بسيط
-            result = pow(result, vec3(0.88));         // gamma تقريبي
+            // حافة خفيفة جدًا (fresnel) بس عشان الحواف الخارجية تبان، من غير أي لمعان حقيقي
+            float NdotV   = max(dot(N, V), 0.0);
+            float fresnel = pow(1.0 - NdotV, 5.0) * 0.06;
+            vec3 rim      = col * fresnel;
+
+            vec3 result = ambient + diffuse + fill + rimLight + rim;
+            result = result / (result + vec3(0.55));  // tone mapping بسيط
+            result = pow(result, vec3(0.9));           // gamma تقريبي
             gl_FragColor = vec4(result, uColor.a * uOpacityMultiplier);
         }
     """.trimIndent()
@@ -334,15 +218,17 @@ class STLRenderer : GLSurfaceView.Renderer {
     fun setModelColor(r: Float, g: Float, b: Float) { modelColor = floatArrayOf(r, g, b, 1.0f) }
 
     // نظام المواد
+    /** كل الخامات دلوقتي بنفس أسلوب الـ Clay المطفي (زي 3ds Max) — الفرق بينهم اللون بس،
+     * مفيش لمعان ولا نقوش procedural خالص. */
     enum class Material(val id: Int, val nameAr: String, val defaultColor: FloatArray) {
-        PLASTIC(0, "بلاستيك", floatArrayOf(0.08f, 0.42f, 0.78f)),
-        METAL  (1, "معدن",    floatArrayOf(0.78f, 0.78f, 0.82f)),
-        WOOD   (2, "خشب",     floatArrayOf(0.55f, 0.32f, 0.12f)),
-        MARBLE (3, "رخام",    floatArrayOf(0.90f, 0.88f, 0.85f)),
-        COPPER (4, "نحاس",    floatArrayOf(0.80f, 0.45f, 0.15f)),
-        CARBON (5, "كربون",   floatArrayOf(0.12f, 0.12f, 0.14f)),
-        GOLD   (6, "ذهب",     floatArrayOf(0.95f, 0.72f, 0.04f)),
-        RUBBER (7, "مطاط",    floatArrayOf(0.10f, 0.10f, 0.10f))
+        CLAY_GRAY  (0, "كلاي رمادي",   floatArrayOf(0.62f, 0.62f, 0.64f)),
+        CLAY_WHITE (1, "كلاي أبيض",    floatArrayOf(0.88f, 0.87f, 0.84f)),
+        CLAY_BLUE  (2, "كلاي أزرق",    floatArrayOf(0.30f, 0.48f, 0.72f)),
+        CLAY_BROWN (3, "كلاي بني",     floatArrayOf(0.50f, 0.34f, 0.22f)),
+        CLAY_ORANGE(4, "كلاي برتقالي", floatArrayOf(0.85f, 0.48f, 0.18f)),
+        CLAY_BLACK (5, "كلاي أسود",    floatArrayOf(0.16f, 0.16f, 0.18f)),
+        CLAY_YELLOW(6, "كلاي أصفر",    floatArrayOf(0.90f, 0.76f, 0.20f)),
+        CLAY_RED   (7, "كلاي أحمر",    floatArrayOf(0.75f, 0.22f, 0.20f))
     }
 
     @Volatile var currentMaterial = Material.PLASTIC
