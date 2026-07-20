@@ -221,14 +221,14 @@ class STLRenderer : GLSurfaceView.Renderer {
     /** كل الخامات دلوقتي بنفس أسلوب الـ Clay المطفي (زي 3ds Max) — الفرق بينهم اللون بس،
      * مفيش لمعان ولا نقوش procedural خالص. */
     enum class Material(val id: Int, val nameAr: String, val defaultColor: FloatArray) {
-        CLAY_GRAY  (0, "كلاي رمادي",   floatArrayOf(0.62f, 0.62f, 0.64f)),
-        CLAY_WHITE (1, "كلاي أبيض",    floatArrayOf(0.88f, 0.87f, 0.84f)),
-        CLAY_BLUE  (2, "كلاي أزرق",    floatArrayOf(0.30f, 0.48f, 0.72f)),
-        CLAY_BROWN (3, "كلاي بني",     floatArrayOf(0.50f, 0.34f, 0.22f)),
-        CLAY_ORANGE(4, "كلاي برتقالي", floatArrayOf(0.85f, 0.48f, 0.18f)),
-        CLAY_BLACK (5, "كلاي أسود",    floatArrayOf(0.16f, 0.16f, 0.18f)),
-        CLAY_YELLOW(6, "كلاي أصفر",    floatArrayOf(0.90f, 0.76f, 0.20f)),
-        CLAY_RED   (7, "كلاي أحمر",    floatArrayOf(0.75f, 0.22f, 0.20f))
+        CLAY_GRAY  (0, " رمادي",   floatArrayOf(0.62f, 0.62f, 0.64f)),
+        CLAY_WHITE (1, " أبيض",    floatArrayOf(0.88f, 0.87f, 0.84f)),
+        CLAY_BLUE  (2, " أزرق",    floatArrayOf(0.30f, 0.48f, 0.72f)),
+        CLAY_BROWN (3, " بني",     floatArrayOf(0.50f, 0.34f, 0.22f)),
+        CLAY_ORANGE(4, " برتقالي", floatArrayOf(0.85f, 0.48f, 0.18f)),
+        CLAY_BLACK (5, " أسود",    floatArrayOf(0.16f, 0.16f, 0.18f)),
+        CLAY_YELLOW(6, " أصفر",    floatArrayOf(0.90f, 0.76f, 0.20f)),
+        CLAY_RED   (7, " أحمر",    floatArrayOf(0.75f, 0.22f, 0.20f))
     }
 
     @Volatile var currentMaterial = Material.CLAY_GRAY
