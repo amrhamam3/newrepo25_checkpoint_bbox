@@ -81,6 +81,15 @@ object DXFParser {
             return AciColors.toColor(aci)
         }
 
+        // بيحتفظ بأسماء كل الطبقات اللي فعليًا اتستخدمت في عناصر مرسومة (مش بس المعرّفة
+        // في جدول LAYER)، بترتيب ظهورها أول مرة — ده اللي هيتعرض في قائمة الطبقات للمستخدم
+        val layerOrder = LinkedHashSet<String>()
+        fun normalizeLayer(layerName: String?): String {
+            val name = layerName ?: "0"
+            layerOrder.add(name)
+            return name
+        }
+
         val lines = mutableListOf<DxfLine>()
         val arcs = mutableListOf<DxfArc>()
         val circles = mutableListOf<DxfCircle>()
@@ -111,7 +120,7 @@ object DXFParser {
                         }
                         pos++
                     }
-                    lines.add(DxfLine(x1, y1, x2, y2, resolveColor(aci, layerName)))
+                    lines.add(DxfLine(x1, y1, x2, y2, resolveColor(aci, layerName), normalizeLayer(layerName)))
                     grow(x1, y1); grow(x2, y2)
                 }
 
@@ -135,12 +144,13 @@ object DXFParser {
                         pos++
                     }
                     val col = resolveColor(aci, layerName)
+                    val lyr = normalizeLayer(layerName)
                     for (k in 0 until pts.size - 1) {
-                        lines.add(DxfLine(pts[k].first, pts[k].second, pts[k + 1].first, pts[k + 1].second, col))
+                        lines.add(DxfLine(pts[k].first, pts[k].second, pts[k + 1].first, pts[k + 1].second, col, lyr))
                         grow(pts[k].first, pts[k].second); grow(pts[k + 1].first, pts[k + 1].second)
                     }
                     if (closed && pts.size > 1) {
-                        lines.add(DxfLine(pts.last().first, pts.last().second, pts.first().first, pts.first().second, col))
+                        lines.add(DxfLine(pts.last().first, pts.last().second, pts.first().first, pts.first().second, col, lyr))
                     }
                 }
 
@@ -175,12 +185,13 @@ object DXFParser {
                         }
                     }
                     val col = resolveColor(aci, layerName)
+                    val lyr = normalizeLayer(layerName)
                     for (k in 0 until pts.size - 1) {
-                        lines.add(DxfLine(pts[k].first, pts[k].second, pts[k + 1].first, pts[k + 1].second, col))
+                        lines.add(DxfLine(pts[k].first, pts[k].second, pts[k + 1].first, pts[k + 1].second, col, lyr))
                         grow(pts[k].first, pts[k].second); grow(pts[k + 1].first, pts[k + 1].second)
                     }
                     if (closed && pts.size > 1) {
-                        lines.add(DxfLine(pts.last().first, pts.last().second, pts.first().first, pts.first().second, col))
+                        lines.add(DxfLine(pts.last().first, pts.last().second, pts.first().first, pts.first().second, col, lyr))
                     }
                     if (pos < entEnd) pos++ // تخطي SEQEND
                 }
@@ -200,7 +211,7 @@ object DXFParser {
                         pos++
                     }
                     if (r > 0f) {
-                        circles.add(DxfCircle(cx, cy, r, resolveColor(aci, layerName)))
+                        circles.add(DxfCircle(cx, cy, r, resolveColor(aci, layerName), normalizeLayer(layerName)))
                         grow(cx - r, cy - r); grow(cx + r, cy + r)
                     }
                 }
@@ -222,7 +233,7 @@ object DXFParser {
                         pos++
                     }
                     if (r > 0f) {
-                        arcs.add(DxfArc(cx, cy, r, startA, endA, resolveColor(aci, layerName)))
+                        arcs.add(DxfArc(cx, cy, r, startA, endA, resolveColor(aci, layerName), normalizeLayer(layerName)))
                         grow(cx - r, cy - r); grow(cx + r, cy + r)
                     }
                 }
@@ -242,7 +253,8 @@ object DXFParser {
             minY = if (minY == Float.MAX_VALUE) 0f else minY,
             maxX = if (maxX == -Float.MAX_VALUE) 1f else maxX,
             maxY = if (maxY == -Float.MAX_VALUE) 1f else maxY,
-            entityCount = totalEntities
+            entityCount = totalEntities,
+            layers = if (layerOrder.isEmpty()) listOf("0") else layerOrder.toList()
         )
     }
 }
