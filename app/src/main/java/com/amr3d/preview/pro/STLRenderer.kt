@@ -295,9 +295,22 @@ class STLRenderer : GLSurfaceView.Renderer {
         updateProjection()
     }
 
-    /** بتبدّل محوري Y وZ في كل بيانات الموديل (vertices + normals + الحدود) — عشان نتعامل
-     * مع ملفات 3ds Max (Z-up) بنفس منطق الرندر اللي مبني على افتراض Y-up من غير ما نغيّر
-     * أي حاجة تانية في الشيدرز أو منطق الدوران. */
+    /** بتحوّل بيانات الموديل من نظام Z-up (زي 3ds Max) لنظام Y-up (اللي الرندر مبني
+     * عليه)، عن طريق دوران حقيقي 90° حول محور X: (x, y, z) -> (x, z, -y).
+     *
+     * ⚠️ السبب الأصلي لعيب الـ Mirror (البند 0): النسخة القديمة كانت بتعمل مجرد
+     * تبديل (swap) بسيط بين Y و Z من غير أي إشارة سالبة: (x, y, z) -> (x, z, y).
+     * رياضيًا، تبديل محورين من غير قلب إشارة أي واحد فيهم هو "انعكاس" (reflection,
+     * determinant = -1) مش دوران (rotation, determinant = +1) — يعني بيقلب
+     * "يدوية" (chirality) الموديل بالكامل، فيظهر الموديل مقلوب زي المراية حتى في
+     * أول رسمة له، والانعكاس تحت الموديل (drawReflection) كان بيورّث نفس العيب
+     * لأنه بيرسم نسخة من نفس بيانات الموديل المقلوبة أصلًا.
+     *
+     * الإصلاح: نستخدم دوران حقيقي حول محور X (x, y, z) -> (x, z, -y) بدل التبديل
+     * المباشر. ده بيحافظ على نفس تأثير "رفع" محور Z القديم ليبقى Y (الارتفاع)
+     * لكن من غير قلب اليدوية، فالموديل بيترسم صح من غير Mirror. ولأنه دوران حقيقي
+     * (مش انعكاس)، ترتيب رؤوس المثلثات (winding order) بيفضل صحيح زي ما هو من
+     * غير أي حاجة تانية محتاجة تتغيّر. */
     private fun swapYZ(model: STLModel): STLModel {
         val v = model.vertices
         val vOut = FloatArray(v.size)
@@ -305,7 +318,7 @@ class STLRenderer : GLSurfaceView.Renderer {
         while (i < v.size) {
             vOut[i] = v[i]
             vOut[i + 1] = v[i + 2]
-            vOut[i + 2] = v[i + 1]
+            vOut[i + 2] = -v[i + 1]
             i += 3
         }
         val n = model.normals
@@ -314,11 +327,11 @@ class STLRenderer : GLSurfaceView.Renderer {
         while (i < n.size) {
             nOut[i] = n[i]
             nOut[i + 1] = n[i + 2]
-            nOut[i + 2] = n[i + 1]
+            nOut[i + 2] = -n[i + 1]
             i += 3
         }
-        val minB = floatArrayOf(model.minBounds[0], model.minBounds[2], model.minBounds[1])
-        val maxB = floatArrayOf(model.maxBounds[0], model.maxBounds[2], model.maxBounds[1])
+        val minB = floatArrayOf(model.minBounds[0], model.minBounds[2], -model.maxBounds[1])
+        val maxB = floatArrayOf(model.maxBounds[0], model.maxBounds[2], -model.minBounds[1])
         return model.copy(vertices = vOut, normals = nOut, minBounds = minB, maxBounds = maxB)
     }
 
