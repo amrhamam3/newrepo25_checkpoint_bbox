@@ -27,6 +27,10 @@ class DXF2DView @JvmOverloads constructor(
     private var snapPoints: List<FloatArray> = emptyList() // كل نقاط النهايات/المراكز القابلة للالتقاط [x, y]
     private val snapRadiusPx = 45f // نصف قطر الالتقاط بالبكسل — لو التاتش قريب من نقطة حقيقية بيلتصق بيها
 
+    // ══ إخفاء/إظهار الطبقات (Layers) ══
+    // بيحتوي على أسماء الطبقات المخفية فقط — أي طبقة مش موجودة هنا معناها ظاهرة (الحالة الافتراضية)
+    private val hiddenLayers = mutableSetOf<String>()
+
     // مصفوفة تحويل من إحداثيات DXF (وحدات الرسم) لإحداثيات الشاشة (بكسل)
     private var scale = 1f
     private var offsetX = 0f
@@ -104,7 +108,9 @@ class DXF2DView @JvmOverloads constructor(
         object : GestureDetector.SimpleOnGestureListener() {
             override fun onDown(e: MotionEvent): Boolean = true
             override fun onScroll(e1: MotionEvent?, e2: MotionEvent, dx: Float, dy: Float): Boolean {
-                if (measureModeOn) return false // في وضع القياس التحريك بإصبعين بس (pinch) مش سحب بإصبع واحد
+                // الـ Pan لازم يفضل شغال بالظبط زي العرض العادي حتى ووضع القياس مفعّل،
+                // عشان المستخدم يقدر يتنقل بحرية ويوصل لأي نقطة يحتاج يقيسها. اختيار نقاط
+                // القياس نفسه بيتم بالـ tap (onSingleTapConfirmed) مش بالسحب، فمفيش تعارض.
                 offsetX -= dx
                 offsetY -= dy
                 invalidate()
@@ -166,21 +172,40 @@ class DXF2DView @JvmOverloads constructor(
     fun setModel(m: DxfModel) {
         model = m
         measureP1 = null; measureP2 = null
+        hiddenLayers.clear() // كل الطبقات ظاهرة افتراضيًا مع أي ملف جديد
         snapPoints = buildSnapPoints(m)
         post { resetView() }
     }
 
-    /** بيجمّع كل نقاط النهايات والمراكز من عناصر الرسمة عشان أداة القياس تقدر تلتقط عليها */
+    /** بيرجّع أسماء كل الطبقات الموجودة في الملف الحالي، بترتيب ظهورها. فاضية لو مفيش موديل محمّل. */
+    fun getLayers(): List<String> = model?.layers ?: emptyList()
+
+    /** true لو الطبقة ظاهرة حاليًا (أو مش معروفة أصلًا — بنعتبرها ظاهرة افتراضيًا) */
+    fun isLayerVisible(layer: String): Boolean = layer !in hiddenLayers
+
+    /** بيتحكم في إظهار/إخفاء طبقة معيّنة — بيعيد بناء نقاط الالتقاط (Snap) عشان أداة
+     * القياس متلتقطش على نقط من طبقة مخفية، وبيعيد رسم الشاشة فورًا. */
+    fun setLayerVisible(layer: String, visible: Boolean) {
+        if (visible) hiddenLayers.remove(layer) else hiddenLayers.add(layer)
+        model?.let { snapPoints = buildSnapPoints(it) }
+        invalidate()
+    }
+
+    /** بيجمّع كل نقاط النهايات والمراكز من عناصر الرسمة عشان أداة القياس تقدر تلتقط عليها —
+     * بيتجاهل عناصر أي طبقة مخفية حاليًا عشان القياس ميلتقطش على حاجة المستخدم مخفيها. */
     private fun buildSnapPoints(m: DxfModel): List<FloatArray> {
         val pts = mutableListOf<FloatArray>()
         for (line in m.lines) {
+            if (!isLayerVisible(line.layer)) continue
             pts.add(floatArrayOf(line.x1, line.y1))
             pts.add(floatArrayOf(line.x2, line.y2))
         }
         for (circle in m.circles) {
+            if (!isLayerVisible(circle.layer)) continue
             pts.add(floatArrayOf(circle.cx, circle.cy)) // مركز الدايرة
         }
         for (arc in m.arcs) {
+            if (!isLayerVisible(arc.layer)) continue
             pts.add(floatArrayOf(arc.cx, arc.cy)) // مركز القوس
             val startRad = Math.toRadians(arc.startDeg.toDouble())
             val endRad = Math.toRadians(arc.endDeg.toDouble())
@@ -246,6 +271,7 @@ class DXF2DView @JvmOverloads constructor(
         val m = model ?: return
 
         for (line in m.lines) {
+            if (!isLayerVisible(line.layer)) continue
             defaultPaint.color = line.color
             canvas.drawLine(
                 toScreenX(line.x1), toScreenY(line.y1),
@@ -255,6 +281,7 @@ class DXF2DView @JvmOverloads constructor(
         }
 
         for (circle in m.circles) {
+            if (!isLayerVisible(circle.layer)) continue
             defaultPaint.color = circle.color
             canvas.drawCircle(
                 toScreenX(circle.cx), toScreenY(circle.cy),
@@ -263,6 +290,7 @@ class DXF2DView @JvmOverloads constructor(
         }
 
         for (arc in m.arcs) {
+            if (!isLayerVisible(arc.layer)) continue
             defaultPaint.color = arc.color
             drawArc(canvas, arc)
         }
